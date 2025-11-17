@@ -1,7 +1,9 @@
 const express = require('express');
 const Booking = require('../models/Booking');
 const Service = require('../models/Service');
+const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { sendBookingConfirmationEmail } = require('../utils/emailService');
 
 const router = express.Router();
 
@@ -56,25 +58,73 @@ router.get('/:id', auth, async (req, res) => {
 // Create booking
 router.post('/', auth, async (req, res) => {
   try {
-    const { serviceId, date, time, address, specialInstructions } = req.body;
+    const { 
+      serviceId, 
+      date, 
+      time, 
+      address, 
+      specialInstructions, 
+      plan = 'one-time',
+      bookingType = 'scheduled',
+      recurringFrequency
+    } = req.body;
 
     const service = await Service.findById(serviceId);
     if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
 
+    // Calculate price based on plan
+    let totalPrice = service.price; // Default to one-time price
+    if (plan !== 'one-time' && service.pricingPlans && service.pricingPlans[plan]) {
+      totalPrice = service.pricingPlans[plan];
+    }
+
+    // For instant bookings, set date/time to now
+    let bookingDate = date;
+    let bookingTime = time;
+    if (bookingType === 'instant') {
+      bookingDate = new Date();
+      bookingTime = new Date().toTimeString().slice(0, 5);
+    }
+
     const booking = new Booking({
       user: req.user.userId,
       service: serviceId,
-      date,
-      time,
+      date: bookingDate,
+      time: bookingTime,
       address,
-      totalPrice: service.price,
+      plan,
+      bookingType,
+      recurringFrequency: bookingType === 'recurring' ? recurringFrequency : undefined,
+      totalPrice,
       specialInstructions,
     });
 
     await booking.save();
     await booking.populate('service');
+    await booking.populate('user', 'name email');
+
+    // Send booking confirmation email (non-blocking)
+    if (booking.user && booking.user.email) {
+      sendBookingConfirmationEmail(
+        booking.user.email,
+        booking.user.name,
+        {
+          service: booking.service,
+          date: booking.date,
+          time: booking.time,
+          address: booking.address,
+          totalPrice: booking.totalPrice,
+          plan: booking.plan,
+          bookingType: booking.bookingType,
+          status: booking.status,
+          specialInstructions: booking.specialInstructions,
+        }
+      ).catch((err) => {
+        console.error('Failed to send booking confirmation email:', err);
+      });
+    }
 
     res.status(201).json(booking);
   } catch (error) {

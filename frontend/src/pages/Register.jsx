@@ -13,16 +13,28 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    countryCode: '+91',
     phone: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    if (name === 'phone') {
+      const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+      setFormData((prev) => ({
+        ...prev,
+        phone: digitsOnly,
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -42,11 +54,25 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await register(formData.name, formData.email, formData.password, formData.phone);
+      const fullPhone = formData.countryCode + formData.phone;
+      await register(formData.name, formData.email, formData.password, fullPhone);
       showToast('Account created successfully!', 'success');
       navigate('/dashboard');
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      console.error('Registration error:', error);
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (error.response) {
+        // Server responded with error
+        errorMessage = error.response.data?.message || errorMessage;
+      } else if (error.request) {
+        // Request made but no response
+        errorMessage = 'Unable to connect to server. Please check your connection.';
+      } else {
+        // Something else happened
+        errorMessage = error.message || errorMessage;
+      }
+      
       setError(errorMessage);
       showToast(errorMessage, 'error');
     } finally {
@@ -89,13 +115,34 @@ const Register = () => {
 
           <div className="form-group">
             <label>Phone</label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="+1 (555) 123-4567"
-            />
+            <div className="phone-input-group">
+              <select
+                name="countryCode"
+                value={formData.countryCode}
+                onChange={handleChange}
+                className="country-code-select"
+              >
+                <option value="+91">🇮🇳 +91 (India)</option>
+                <option value="+1">🇺🇸 +1 (USA)</option>
+                <option value="+44">🇬🇧 +44 (UK)</option>
+                <option value="+61">🇦🇺 +61 (Australia)</option>
+                <option value="+86">🇨🇳 +86 (China)</option>
+                <option value="+971">🇦🇪 +971 (UAE)</option>
+                <option value="+65">🇸🇬 +65 (Singapore)</option>
+              </select>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="9876543210"
+                className="phone-number-input"
+                inputMode="numeric"
+                pattern="[0-9]{7,10}"
+                maxLength={10}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">

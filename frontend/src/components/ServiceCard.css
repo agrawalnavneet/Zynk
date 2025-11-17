@@ -4,11 +4,36 @@
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
 }
 
 .service-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quick-service-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 .service-image {
@@ -58,9 +83,13 @@
   font-size: 0.875rem;
 }
 
+.service-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .service-btn {
-  display: inline-block;
-  width: 100%;
+  flex: 1;
   text-align: center;
   background: #10b981;
   color: white;
@@ -69,9 +98,38 @@
   text-decoration: none;
   font-weight: 500;
   transition: background 0.3s;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
 }
 
 .service-btn:hover {
   background: #059669;
+}
+
+.service-btn-cart {
+  flex: 1;
+  text-align: center;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid #10b981;
+  font-weight: 600;
+  transition: all 0.3s;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.service-btn-cart:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-color: #047857;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
 }
 

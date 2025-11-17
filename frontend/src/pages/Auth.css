@@ -67,6 +67,45 @@
   border-color: #10b981;
 }
 
+.phone-input-group {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.country-code-select {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  min-width: 150px;
+}
+
+.country-code-select:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.phone-number-input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .phone-input-group {
+    grid-template-columns: 1fr;
+  }
+
+  .country-code-select {
+    width: 100%;
+  }
+}
+
 .auth-btn {
   width: 100%;
   background: #10b981;

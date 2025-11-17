@@ -42,9 +42,34 @@ const bookingSchema = new mongoose.Schema({
     enum: ['pending', 'confirmed', 'in-progress', 'completed', 'cancelled'],
     default: 'pending',
   },
+  plan: {
+    type: String,
+    enum: ['one-time', 'hourly', 'daily', 'weekly', 'monthly', 'yearly'],
+    default: 'one-time',
+  },
+  bookingType: {
+    type: String,
+    enum: ['instant', 'scheduled', 'recurring'],
+    default: 'scheduled',
+  },
+  recurringFrequency: {
+    type: String,
+    enum: ['daily', 'weekly', 'monthly'],
+  },
   totalPrice: {
     type: Number,
     required: true,
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'paid', 'failed', 'refunded'],
+    default: 'pending',
+  },
+  paymentId: {
+    type: String,
+  },
+  razorpayOrderId: {
+    type: String,
   },
   specialInstructions: {
     type: String,

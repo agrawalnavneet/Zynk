@@ -12,7 +12,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: #1f2937;
   line-height: 1.6;
-}
+  }
 
 .App {
   min-height: 100vh;

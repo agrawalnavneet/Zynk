@@ -3,6 +3,7 @@ import api from '../utils/api';
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -31,23 +32,42 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       localStorage.removeItem('token');
       setUser(null);
+      console.error('Failed to fetch current user:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', res.data.token);
-    setUser(res.data.user);
-    return res.data;
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      if (res.data.token && res.data.user) {
+        localStorage.setItem('token', res.data.token);
+        setUser(res.data.user);
+        return res.data;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error; // Re-throw to let the component handle it
+    }
   };
 
   const register = async (name, email, password, phone) => {
-    const res = await api.post('/auth/register', { name, email, password, phone });
-    localStorage.setItem('token', res.data.token);
-    setUser(res.data.user);
-    return res.data;
+    try {
+      const res = await api.post('/auth/register', { name, email, password, phone });
+      if (res.data.token && res.data.user) {
+        localStorage.setItem('token', res.data.token);
+        setUser(res.data.user);
+        return res.data;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error; // Re-throw to let the component handle it
+    }
   };
 
   const logout = () => {

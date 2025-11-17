@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { sendWelcomeEmail, sendLoginEmail } = require('../utils/emailService');
 
 const router = express.Router();
 
@@ -18,7 +19,8 @@ router.post(
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        const firstError = errors.array()[0];
+        return res.status(400).json({ message: firstError.msg || 'Validation failed' });
       }
 
       const { name, email, password, phone } = req.body;
@@ -38,6 +40,11 @@ router.post(
         expiresIn: '7d',
       });
 
+      // Send welcome email (non-blocking)
+      sendWelcomeEmail(user.email, user.name).catch((err) => {
+        console.error('Failed to send welcome email:', err);
+      });
+
       res.status(201).json({
         token,
         user: {
@@ -48,8 +55,11 @@ router.post(
         },
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      console.error('Registration error:', error);
+      if (error.code === 11000) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+      res.status(500).json({ message: error.message || 'Server error. Please try again.' });
     }
   }
 );
@@ -65,7 +75,8 @@ router.post(
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        const firstError = errors.array()[0];
+        return res.status(400).json({ message: firstError.msg || 'Validation failed' });
       }
 
       const { email, password } = req.body;
@@ -73,18 +84,28 @@ router.post(
       // Check if user exists
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
 
       // Check password
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
 
       // Generate token
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
         expiresIn: '7d',
+      });
+
+      // Send login notification email (non-blocking)
+      const loginTime = new Date().toLocaleString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        dateStyle: 'full',
+        timeStyle: 'long',
+      });
+      sendLoginEmail(user.email, user.name, loginTime).catch((err) => {
+        console.error('Failed to send login email:', err);
       });
 
       res.json({
@@ -97,8 +118,8 @@ router.post(
         },
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      console.error('Login error:', error);
+      res.status(500).json({ message: error.message || 'Server error. Please try again.' });
     }
   }
 );

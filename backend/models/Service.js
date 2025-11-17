@@ -13,6 +13,28 @@ const serviceSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  pricingPlans: {
+    hourly: {
+      type: Number,
+      default: null,
+    },
+    daily: {
+      type: Number,
+      default: null,
+    },
+    weekly: {
+      type: Number,
+      default: null,
+    },
+    monthly: {
+      type: Number,
+      default: null,
+    },
+    yearly: {
+      type: Number,
+      default: null,
+    },
+  },
   duration: {
     type: Number, // in minutes
     required: true,
@@ -22,8 +44,12 @@ const serviceSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['deep-cleaning', 'regular-cleaning', 'move-in-out', 'office-cleaning', 'post-construction'],
+    enum: ['deep-cleaning', 'regular-cleaning', 'move-in-out', 'office-cleaning', 'post-construction', 'quick-service'],
     required: true,
+  },
+  isQuickService: {
+    type: Boolean,
+    default: false,
   },
   isActive: {
     type: Boolean,

@@ -120,8 +120,32 @@ const Dashboard = () => {
                       </span>
                     </div>
                     <div className="detail-row">
+                      <span className="detail-label">Booking Type:</span>
+                      <span className="booking-type-badge">
+                        {booking.bookingType === 'instant' ? '⚡ Instant' : 
+                         booking.bookingType === 'scheduled' ? '📅 Scheduled' : 
+                         '🔄 Recurring'}
+                        {booking.recurringFrequency && ` (${booking.recurringFrequency})`}
+                      </span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">Plan:</span>
+                      <span className="plan-badge-dashboard">
+                        {booking.plan === 'one-time' ? 'One-Time' : booking.plan.charAt(0).toUpperCase() + booking.plan.slice(1)}
+                      </span>
+                    </div>
+                    <div className="detail-row">
                       <span className="detail-label">Total Price:</span>
                       <span className="price">${booking.totalPrice}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">Payment Status:</span>
+                      <span className={`payment-status-badge ${booking.paymentStatus || 'pending'}`}>
+                        {booking.paymentStatus === 'paid' ? '✓ Paid' : 
+                         booking.paymentStatus === 'failed' ? '✕ Failed' : 
+                         booking.paymentStatus === 'refunded' ? '↩ Refunded' : 
+                         '⏳ Pending'}
+                      </span>
                     </div>
                     {booking.specialInstructions && (
                       <div className="detail-row">

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import AddToCartModal from '../components/AddToCartModal';
 import './ServiceDetail.css';
 
 const ServiceDetail = () => {
@@ -13,12 +14,9 @@ const ServiceDetail = () => {
   const { showToast } = useToast();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCartModal, setShowCartModal] = useState(false);
 
-  useEffect(() => {
-    fetchService();
-  }, [id]);
-
-  const fetchService = async () => {
+  const fetchService = useCallback(async () => {
     try {
       const res = await api.get(`/services/${id}`);
       setService(res.data);
@@ -28,14 +26,19 @@ const ServiceDetail = () => {
       showToast('Failed to load service. Please try again.', 'error');
       setLoading(false);
     }
-  };
+  }, [id, showToast]);
+
+  useEffect(() => {
+    fetchService();
+  }, [fetchService]);
 
   const handleBookNow = () => {
     if (!user) {
       navigate('/login', { state: { from: `/services/${id}` } });
-    } else {
-      navigate(`/booking/${id}`);
+      return;
     }
+    // Show cart modal to select plan
+    setShowCartModal(true);
   };
 
   if (loading) {
@@ -71,14 +74,41 @@ const ServiceDetail = () => {
           )}
           
           <div className="service-detail-info">
-            <h1>{service.name}</h1>
+            <div className="service-header">
+              <h1>{service.name}</h1>
+              {(service.isQuickService || service.duration === 15) && (
+                <div className="quick-service-badge-large">⚡ 15 Min Service</div>
+              )}
+            </div>
             <p className="service-description">{service.description}</p>
             
             <div className="service-details">
               <div className="detail-item">
-                <span className="detail-label">Price:</span>
+                <span className="detail-label">One-Time Price:</span>
                 <span className="detail-value">${service.price}</span>
               </div>
+              {service.pricingPlans && Object.keys(service.pricingPlans).some(key => service.pricingPlans[key] !== null) && (
+                <div className="detail-item plans-section">
+                  <span className="detail-label">Available Plans:</span>
+                  <div className="plans-preview">
+                    {service.pricingPlans.hourly && (
+                      <span className="plan-badge">Hourly: ${service.pricingPlans.hourly}</span>
+                    )}
+                    {service.pricingPlans.daily && (
+                      <span className="plan-badge">Daily: ${service.pricingPlans.daily}</span>
+                    )}
+                    {service.pricingPlans.weekly && (
+                      <span className="plan-badge">Weekly: ${service.pricingPlans.weekly}</span>
+                    )}
+                    {service.pricingPlans.monthly && (
+                      <span className="plan-badge">Monthly: ${service.pricingPlans.monthly}</span>
+                    )}
+                    {service.pricingPlans.yearly && (
+                      <span className="plan-badge">Yearly: ${service.pricingPlans.yearly}</span>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className="detail-item">
                 <span className="detail-label">Duration:</span>
                 <span className="detail-value">{service.duration} minutes</span>
@@ -89,12 +119,19 @@ const ServiceDetail = () => {
               </div>
             </div>
 
-            <button onClick={handleBookNow} className="book-now-btn">
-              Book This Service
-            </button>
+            <div className="service-actions-detail">
+              <button onClick={handleBookNow} className="book-now-btn">
+                🛒 Add to Cart & Book
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      <AddToCartModal 
+        service={service} 
+        isOpen={showCartModal} 
+        onClose={() => setShowCartModal(false)} 
+      />
     </div>
   );
 };

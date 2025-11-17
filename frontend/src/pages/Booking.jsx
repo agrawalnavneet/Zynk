@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -14,6 +14,9 @@ const Booking = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchingService, setFetchingService] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState('one-time');
+  const [bookingType, setBookingType] = useState('scheduled');
+  const [recurringFrequency, setRecurringFrequency] = useState('');
   const [formData, setFormData] = useState({
     date: '',
     time: '',
@@ -24,15 +27,7 @@ const Booking = () => {
     specialInstructions: '',
   });
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login', { state: { from: `/booking/${id}` } });
-      return;
-    }
-    fetchService();
-  }, [id, user, navigate]);
-
-  const fetchService = async () => {
+  const fetchService = useCallback(async () => {
     try {
       const res = await api.get(`/services/${id}`);
       setService(res.data);
@@ -42,7 +37,15 @@ const Booking = () => {
     } finally {
       setFetchingService(false);
     }
-  };
+  }, [id, showToast]);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { state: { from: `/booking/${id}` } });
+      return;
+    }
+    fetchService();
+  }, [id, user, navigate, fetchService]);
 
   const handleChange = (e) => {
     setFormData({
@@ -56,10 +59,25 @@ const Booking = () => {
     setLoading(true);
 
     try {
+      if (bookingType === 'recurring' && !recurringFrequency) {
+        showToast('Please select recurring frequency', 'error');
+        setLoading(false);
+        return;
+      }
+
+      if (bookingType === 'scheduled' && (!formData.date || !formData.time)) {
+        showToast('Please select date and time for scheduled booking', 'error');
+        setLoading(false);
+        return;
+      }
+
       const bookingData = {
         serviceId: id,
-        date: formData.date,
-        time: formData.time,
+        date: bookingType === 'instant' ? new Date().toISOString() : formData.date,
+        time: bookingType === 'instant' ? new Date().toTimeString().slice(0, 5) : formData.time,
+        plan: selectedPlan,
+        bookingType,
+        recurringFrequency: bookingType === 'recurring' ? recurringFrequency : undefined,
         address: {
           street: formData.street,
           city: formData.city,
@@ -114,8 +132,18 @@ const Booking = () => {
               <p>{service.description}</p>
               <div className="summary-details">
                 <div className="summary-item">
+                  <span>Plan:</span>
+                  <span className="plan-name">{selectedPlan === 'one-time' ? 'One-Time' : selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}</span>
+                </div>
+                <div className="summary-item">
                   <span>Price:</span>
-                  <span className="price">${service.price}</span>
+                  <span className="price">
+                    ${selectedPlan === 'one-time' 
+                      ? service.price 
+                      : (service.pricingPlans && service.pricingPlans[selectedPlan]) 
+                        ? service.pricingPlans[selectedPlan] 
+                        : service.price}
+                  </span>
                 </div>
                 <div className="summary-item">
                   <span>Duration:</span>
@@ -127,29 +155,146 @@ const Booking = () => {
 
           <form className="booking-form" onSubmit={handleSubmit}>
             <h2>Booking Details</h2>
-            
-            <div className="form-group">
-              <label>Date *</label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
 
             <div className="form-group">
-              <label>Time *</label>
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                required
-              />
+              <label>Booking Type *</label>
+              <div className="booking-type-options">
+                <button
+                  type="button"
+                  className={`booking-type-btn ${bookingType === 'instant' ? 'active' : ''}`}
+                  onClick={() => setBookingType('instant')}
+                >
+                  ⚡ Instant
+                  <span>Get service now</span>
+                </button>
+                <button
+                  type="button"
+                  className={`booking-type-btn ${bookingType === 'scheduled' ? 'active' : ''}`}
+                  onClick={() => setBookingType('scheduled')}
+                >
+                  📅 Scheduled
+                  <span>Book for later</span>
+                </button>
+                <button
+                  type="button"
+                  className={`booking-type-btn ${bookingType === 'recurring' ? 'active' : ''}`}
+                  onClick={() => setBookingType('recurring')}
+                >
+                  🔄 Recurring
+                  <span>Repeat service</span>
+                </button>
+              </div>
             </div>
+
+            {bookingType === 'recurring' && (
+              <div className="form-group">
+                <label>Recurring Frequency *</label>
+                <select
+                  value={recurringFrequency}
+                  onChange={(e) => setRecurringFrequency(e.target.value)}
+                  required
+                  className="form-select"
+                >
+                  <option value="">Select frequency</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+            )}
+            
+            {service.pricingPlans && Object.keys(service.pricingPlans).some(key => service.pricingPlans[key] !== null) && (
+              <div className="form-group">
+                <label>Select Plan *</label>
+                <div className="plan-options">
+                  <button
+                    type="button"
+                    className={`plan-option ${selectedPlan === 'one-time' ? 'active' : ''}`}
+                    onClick={() => setSelectedPlan('one-time')}
+                  >
+                    <div className="plan-label">One-Time</div>
+                    <div className="plan-price">${service.price}</div>
+                  </button>
+                  {service.pricingPlans.hourly && (
+                    <button
+                      type="button"
+                      className={`plan-option ${selectedPlan === 'hourly' ? 'active' : ''}`}
+                      onClick={() => setSelectedPlan('hourly')}
+                    >
+                      <div className="plan-label">Hourly</div>
+                      <div className="plan-price">${service.pricingPlans.hourly}</div>
+                    </button>
+                  )}
+                  {service.pricingPlans.daily && (
+                    <button
+                      type="button"
+                      className={`plan-option ${selectedPlan === 'daily' ? 'active' : ''}`}
+                      onClick={() => setSelectedPlan('daily')}
+                    >
+                      <div className="plan-label">Daily</div>
+                      <div className="plan-price">${service.pricingPlans.daily}</div>
+                    </button>
+                  )}
+                  {service.pricingPlans.weekly && (
+                    <button
+                      type="button"
+                      className={`plan-option ${selectedPlan === 'weekly' ? 'active' : ''}`}
+                      onClick={() => setSelectedPlan('weekly')}
+                    >
+                      <div className="plan-label">Weekly</div>
+                      <div className="plan-price">${service.pricingPlans.weekly}</div>
+                    </button>
+                  )}
+                  {service.pricingPlans.monthly && (
+                    <button
+                      type="button"
+                      className={`plan-option ${selectedPlan === 'monthly' ? 'active' : ''}`}
+                      onClick={() => setSelectedPlan('monthly')}
+                    >
+                      <div className="plan-label">Monthly</div>
+                      <div className="plan-price">${service.pricingPlans.monthly}</div>
+                    </button>
+                  )}
+                  {service.pricingPlans.yearly && (
+                    <button
+                      type="button"
+                      className={`plan-option ${selectedPlan === 'yearly' ? 'active' : ''}`}
+                      onClick={() => setSelectedPlan('yearly')}
+                    >
+                      <div className="plan-label">Yearly</div>
+                      <div className="plan-price">${service.pricingPlans.yearly}</div>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {bookingType === 'scheduled' && (
+              <>
+                <div className="form-group">
+                  <label>Date *</label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    required
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Time *</label>
+                  <input
+                    type="time"
+                    name="time"
+                    value={formData.time}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </>
+            )}
 
             <div className="form-group">
               <label>Street Address *</label>
@@ -216,7 +361,7 @@ const Booking = () => {
                   Booking...
                 </>
               ) : (
-                'Confirm Booking'
+                `Confirm ${bookingType === 'instant' ? 'Instant' : bookingType === 'scheduled' ? 'Scheduled' : 'Recurring'} Booking`
               )}
             </button>
           </form>

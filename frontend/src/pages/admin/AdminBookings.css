@@ -1,0 +1,123 @@
+.admin-bookings {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.bookings-count {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 12px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.booking-id {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.user-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.user-email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.date-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.time {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.address-cell {
+  max-width: 200px;
+  font-size: 13px;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amount-cell {
+  font-weight: 600;
+  color: #059669;
+}
+
+.status-select {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    font-size: 13px;
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    padding: 10px 8px;
+  }
+  
+  .status-select {
+    min-width: 120px;
+    font-size: 12px;
+  }
+}
+

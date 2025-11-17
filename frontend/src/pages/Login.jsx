@@ -34,7 +34,20 @@ const Login = () => {
       const from = location.state?.from || '/dashboard';
       navigate(from);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
+      console.error('Login error:', error);
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error.response) {
+        // Server responded with error
+        errorMessage = error.response.data?.message || errorMessage;
+      } else if (error.request) {
+        // Request made but no response
+        errorMessage = 'Unable to connect to server. Please check your connection.';
+      } else {
+        // Something else happened
+        errorMessage = error.message || errorMessage;
+      }
+      
       setError(errorMessage);
       showToast(errorMessage, 'error');
     } finally {
