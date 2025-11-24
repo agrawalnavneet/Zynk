@@ -75,14 +75,35 @@ const Checkout = () => {
       return;
     }
 
-    // Check if Razorpay key is configured
+    // Check if Razorpay key is configured (LIVE mode only)
     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
     if (!razorpayKey || razorpayKey === 'your_razorpay_key_id' || razorpayKey.trim() === '') {
-      showToast('Payment gateway not configured. Please set VITE_RAZORPAY_KEY_ID in frontend/.env file. See RAZORPAY_SETUP.md for instructions.', 'error');
-      console.error('Razorpay Key ID not configured. Current value:', razorpayKey);
+      showToast('Payment gateway not configured. Please set VITE_RAZORPAY_KEY_ID (LIVE key) in frontend/.env file.', 'error');
+      console.error('❌ Razorpay Key ID not configured. Current value:', razorpayKey);
       setLoading(false);
       return;
     }
+    
+    // STRICT VALIDATION: Reject test keys - only allow LIVE keys
+    if (razorpayKey.startsWith('rzp_test_')) {
+      showToast('Test keys detected! This application requires LIVE keys. Please update frontend/.env with LIVE keys starting with "rzp_live_".', 'error');
+      console.error('❌ ERROR: Test keys detected! Key ID starts with "rzp_test_"');
+      console.error('❌ Please use LIVE keys starting with "rzp_live_"');
+      console.error('❌ Get LIVE keys from: https://dashboard.razorpay.com/app/keys');
+      setLoading(false);
+      return;
+    }
+    
+    if (!razorpayKey.startsWith('rzp_live_')) {
+      showToast('Invalid key format. Keys must start with "rzp_live_" for LIVE mode. Please check your frontend/.env file.', 'error');
+      console.error('❌ ERROR: Invalid Razorpay Key ID format. Key must start with "rzp_live_" for LIVE mode.');
+      console.error('❌ Current Key ID:', razorpayKey.substring(0, 20) + '...');
+      setLoading(false);
+      return;
+    }
+    
+    console.log('✅ Using Razorpay LIVE mode');
+    console.log('⚠️  WARNING: This is LIVE mode - all payments are REAL transactions!');
 
     try {
       // Create Razorpay order

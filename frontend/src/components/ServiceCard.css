@@ -133,3 +133,34 @@
   box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
 }
 
+@media (max-width: 768px) {
+  .service-image {
+    height: 180px;
+  }
+
+  .service-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .service-actions {
+    flex-direction: column;
+  }
+
+  .service-btn,
+  .service-btn-cart {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .service-content {
+    padding: 1.25rem;
+  }
+
+  .service-content h3 {
+    font-size: 1.1rem;
+  }
+}
+

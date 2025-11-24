@@ -106,6 +106,22 @@
   }
 }
 
+@media (max-width: 640px) {
+  .auth-page {
+    padding: 2rem 1rem;
+    align-items: flex-start;
+  }
+
+  .auth-container {
+    padding: 2rem 1.25rem;
+    border-radius: 0.5rem;
+  }
+
+  .auth-container h1 {
+    font-size: 1.75rem;
+  }
+}
+
 .auth-btn {
   width: 100%;
   background: #10b981;
@@ -141,5 +157,23 @@
 
 .auth-footer a:hover {
   text-decoration: underline;
+}
+
+.otp-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 

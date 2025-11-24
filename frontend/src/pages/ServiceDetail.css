@@ -182,9 +182,44 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .service-detail-content {
     grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .service-detail {
+    padding: 2rem 0;
+  }
+
+  .service-detail-info h1 {
+    font-size: 2rem;
+  }
+
+  .service-description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .service-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .service-detail-image {
+    border-radius: 0.5rem;
+  }
+
+  .service-actions-detail {
+    flex-direction: column;
+  }
+
+  .book-now-btn,
+  .add-to-cart-btn {
+    width: 100%;
   }
 }
 

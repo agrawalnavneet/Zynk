@@ -14,6 +14,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .navbar-logo {
@@ -21,6 +23,25 @@
   font-weight: bold;
   color: #10b981;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-image {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 480px) {
+  .logo-image {
+    height: 32px;
+  }
+  
+  .navbar-logo span {
+    font-size: 1.25rem;
+  }
 }
 
 .navbar-menu {
@@ -124,5 +145,93 @@
 .admin-link:hover {
   background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
   color: white !important;
+}
+
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  gap: 6px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.navbar-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #1f2937;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.navbar-toggle.open span:nth-child(1) {
+  transform: translateY(4px) rotate(45deg);
+}
+
+.navbar-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggle.open span:nth-child(3) {
+  transform: translateY(-4px) rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+  .navbar-container {
+    padding: 0 1.5rem;
+  }
+
+  .navbar-toggle {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .navbar-menu {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 1rem 0 0;
+    border-top: 1px solid #e5e7eb;
+    display: none;
+  }
+
+  .navbar-menu.open {
+    display: flex;
+  }
+
+  .navbar-menu li {
+    width: 100%;
+  }
+
+  .navbar-menu li a,
+  .navbar-menu button,
+  .navbar-menu .register-btn,
+  .navbar-menu .logout-btn {
+    width: 100%;
+    display: inline-flex;
+    justify-content: center;
+  }
+
+  .cart-icon-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.75rem 0;
+  }
+
+  .navbar-container {
+    padding: 0 1rem;
+  }
 }
 

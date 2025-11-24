@@ -11,6 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [cartOpen, setCartOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Hide the regular navbar (and cart) on admin routes
   if (location.pathname.startsWith('/admin')) return null;
@@ -20,24 +21,45 @@ const Navbar = () => {
     navigate('/');
   };
 
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
+  const closeMenu = () => setMenuOpen(false);
+
+  const openCart = () => {
+    setCartOpen(true);
+    closeMenu();
+  };
+
   return (
     <>
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/" className="navbar-logo">
-            Zynkly
+          
+
+ {/*<img src="/vite.jpeg" alt="Zynkly Logo" className="logo-image" /> */}
+            <span>Zynkly</span>
           </Link>
-          <ul className="navbar-menu">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/services">Services</Link></li>
+          <button
+            className={`navbar-toggle ${menuOpen ? 'open' : ''}`}
+            onClick={toggleMenu}
+            aria-label="Toggle navigation menu"
+            aria-expanded={menuOpen}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <ul className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
+            <li><Link to="/" onClick={closeMenu}>Home</Link></li>
+            <li><Link to="/services" onClick={closeMenu}>Services</Link></li>
             {user ? (
               <>
-                <li><Link to="/dashboard">Dashboard</Link></li>
+                <li><Link to="/dashboard" onClick={closeMenu}>Dashboard</Link></li>
                 {user.role === 'admin' && (
-                  <li><Link to="/admin" className="admin-link">Admin Panel</Link></li>
+                  <li><Link to="/admin" className="admin-link" onClick={closeMenu}>Admin Panel</Link></li>
                 )}
                 <li>
-                  <button className="cart-icon-btn" onClick={() => setCartOpen(true)} title="View Cart">
+                  <button className="cart-icon-btn" onClick={openCart} title="View Cart">
                     🛒 Cart
                     {getTotalItems() > 0 && (
                       <span className="cart-badge">{getTotalItems()}</span>
@@ -45,20 +67,20 @@ const Navbar = () => {
                   </button>
                 </li>
                 <li><span className="user-name">{user.name}</span></li>
-                <li><button onClick={handleLogout} className="logout-btn">Logout</button></li>
+                <li><button onClick={() => { handleLogout(); closeMenu(); }} className="logout-btn">Logout</button></li>
               </>
             ) : (
               <>
                 <li>
-                  <button className="cart-icon-btn" onClick={() => setCartOpen(true)} title="View Cart">
+                  <button className="cart-icon-btn" onClick={openCart} title="View Cart">
                     🛒 Cart
                     {getTotalItems() > 0 && (
                       <span className="cart-badge">{getTotalItems()}</span>
                     )}
                   </button>
                 </li>
-                <li><Link to="/login">Login</Link></li>
-                <li><Link to="/register" className="register-btn">Sign Up</Link></li>
+                <li><Link to="/login" onClick={closeMenu}>Login</Link></li>
+                <li><Link to="/register" className="register-btn" onClick={closeMenu}>Sign Up</Link></li>
               </>
             )}
           </ul>

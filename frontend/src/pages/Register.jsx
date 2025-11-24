@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import api from '../utils/api';
 import './Auth.css';
 
 const Register = () => {
@@ -18,6 +19,11 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,7 +43,8 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  // Send OTP
+  const handleSendOTP = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -54,22 +61,34 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const fullPhone = formData.countryCode + formData.phone;
-      await register(formData.name, formData.email, formData.password, fullPhone);
-      showToast('Account created successfully!', 'success');
-      navigate('/dashboard');
+      await api.post('/auth/send-otp', {
+        email: formData.email,
+        name: formData.name,
+      });
+      
+      setOtpSent(true);
+      showToast('OTP sent to your email. Please check your inbox.', 'success');
+      
+      // Start resend timer (60 seconds)
+      setResendTimer(60);
+      const timer = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (error) {
-      console.error('Registration error:', error);
-      let errorMessage = 'Registration failed. Please try again.';
+      console.error('Send OTP error:', error);
+      let errorMessage = 'Failed to send OTP. Please try again.';
       
       if (error.response) {
-        // Server responded with error
         errorMessage = error.response.data?.message || errorMessage;
       } else if (error.request) {
-        // Request made but no response
         errorMessage = 'Unable to connect to server. Please check your connection.';
       } else {
-        // Something else happened
         errorMessage = error.message || errorMessage;
       }
       
@@ -80,15 +99,199 @@ const Register = () => {
     }
   };
 
+  // Resend OTP
+  const handleResendOTP = async () => {
+    if (resendTimer > 0) return;
+    
+    setOtpError('');
+    setOtpLoading(true);
+
+    try {
+      await api.post('/auth/send-otp', {
+        email: formData.email,
+        name: formData.name,
+      });
+      
+      showToast('OTP resent to your email.', 'success');
+      setResendTimer(60);
+      
+      const timer = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to resend OTP. Please try again.';
+      setOtpError(errorMessage);
+      showToast(errorMessage, 'error');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Verify OTP and Register
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setOtpError('');
+
+    if (otp.length !== 6) {
+      setOtpError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    setOtpLoading(true);
+
+    try {
+      const fullPhone = formData.countryCode + formData.phone;
+      const response = await api.post('/auth/verify-otp-and-register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: fullPhone,
+        otp: otp,
+      });
+
+      // Store token and user data
+      if (response.data.token && response.data.user) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+
+      showToast('Email verified! Account created successfully!', 'success');
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      let errorMessage = 'OTP verification failed. Please try again.';
+      
+      if (error.response) {
+        errorMessage = error.response.data?.message || errorMessage;
+      } else if (error.request) {
+        errorMessage = 'Unable to connect to server. Please check your connection.';
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+      
+      setOtpError(errorMessage);
+      showToast(errorMessage, 'error');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // OTP Verification Step
+  if (otpSent) {
+    return (
+      <div className="auth-page">
+        <div className="auth-container">
+          <h1>Verify Your Email</h1>
+          <p className="auth-subtitle">
+            We've sent a 6-digit OTP to <strong>{formData.email}</strong>
+          </p>
+          <p className="auth-subtitle" style={{ fontSize: '0.9rem', color: '#6b7280' }}>
+            Please check your inbox and enter the OTP below to complete registration.
+          </p>
+
+          {otpError && <div className="error-message">{otpError}</div>}
+
+          <form onSubmit={handleVerifyOTP} className="auth-form">
+            <div className="form-group">
+              <label>Enter OTP</label>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  setOtp(value);
+                  setOtpError('');
+                }}
+                placeholder="000000"
+                maxLength={6}
+                required
+                className="otp-input"
+                style={{
+                  textAlign: 'center',
+                  fontSize: '1.5rem',
+                  letterSpacing: '0.5rem',
+                  fontFamily: 'monospace',
+                }}
+              />
+            </div>
+
+            <button type="submit" className="auth-btn" disabled={otpLoading || otp.length !== 6}>
+              {otpLoading ? 'Verifying...' : 'Verify & Create Account'}
+            </button>
+
+            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+              <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+                Didn't receive the OTP?{' '}
+                {resendTimer > 0 ? (
+                  <span style={{ color: '#9ca3af' }}>
+                    Resend in {resendTimer}s
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOTP}
+                    disabled={otpLoading}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#10b981',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    Resend OTP
+                  </button>
+                )}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOtpSent(false);
+                setOtp('');
+                setOtpError('');
+                setResendTimer(0);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#6b7280',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                fontSize: '0.9rem',
+                marginTop: '1rem',
+              }}
+            >
+              ← Change Email
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Registration Form Step
   return (
     <div className="auth-page">
       <div className="auth-container">
         <h1>Sign Up</h1>
         <p className="auth-subtitle">Create an account to book cleaning services.</p>
+        <p className="auth-subtitle" style={{ fontSize: '0.9rem', color: '#6b7280' }}>
+          We'll send a verification code to your email to verify your account.
+        </p>
 
         {error && <div className="error-message">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSendOTP} className="auth-form">
           <div className="form-group">
             <label>Full Name</label>
             <input
@@ -170,7 +373,7 @@ const Register = () => {
           </div>
 
           <button type="submit" className="auth-btn" disabled={loading}>
-            {loading ? 'Creating account...' : 'Sign Up'}
+            {loading ? 'Sending OTP...' : 'Send Verification Code'}
           </button>
         </form>
 

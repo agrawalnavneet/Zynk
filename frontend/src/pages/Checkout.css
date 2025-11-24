@@ -335,3 +335,41 @@
   }
 }
 
+@media (max-width: 640px) {
+  .checkout-page {
+    padding: 2rem 0;
+  }
+
+  .checkout-page h1 {
+    font-size: 2rem;
+  }
+
+  .checkout-form,
+  .checkout-summary {
+    padding: 1.5rem;
+  }
+
+  .summary-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .summary-total {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .payment-total-row {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+
+  .submit-btn {
+    font-size: 1.1rem;
+    padding: 1rem;
+  }
+}
+

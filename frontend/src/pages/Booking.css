@@ -245,13 +245,49 @@
   font-weight: 500;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .booking-content {
     grid-template-columns: 1fr;
   }
 
+  .summary-card {
+    position: relative;
+  }
+}
+
+@media (max-width: 768px) {
+  .booking-page {
+    padding: 2rem 0;
+  }
+
+  .booking-form {
+    padding: 1.5rem;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .booking-type-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .booking-page h1 {
+    font-size: 2rem;
+  }
+
+  .plan-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-form {
+    padding: 1.25rem;
+  }
+
+  .summary-card {
+    padding: 1.25rem;
   }
 }
 

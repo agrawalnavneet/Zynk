@@ -655,9 +655,165 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
   }
 };
 
+// Send OTP email for email verification
+const sendOTPEmail = async (userEmail, otp) => {
+  // Check if email is configured
+  if (!isEmailConfigured()) {
+    console.log('⚠️  Email not configured. Skipping OTP email to:', userEmail);
+    return null;
+  }
+
+  // Get transporter (will create/verify if needed)
+  const emailTransporter = await getTransporter();
+  if (!emailTransporter) {
+    console.log('⚠️  Email transporter not available. Skipping OTP email to:', userEmail);
+    if (transporterError) {
+      console.error('   Last error:', transporterError.message);
+    }
+    return null;
+  }
+
+  try {
+    const mailOptions = {
+      from: `"Zynkly" <${process.env.SMTP_USER}>`,
+      to: userEmail,
+      subject: 'Email Verification OTP - Zynkly',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #f9fafb;
+            }
+            .header {
+              background-color: #10b981;
+              color: white;
+              padding: 30px;
+              text-align: center;
+              border-radius: 8px 8px 0 0;
+            }
+            .content {
+              background-color: white;
+              padding: 30px;
+              border-radius: 0 0 8px 8px;
+            }
+            .otp-box {
+              background-color: #d1fae5;
+              padding: 30px;
+              border-radius: 8px;
+              text-align: center;
+              margin: 30px 0;
+              border: 2px solid #10b981;
+            }
+            .otp-code {
+              font-size: 48px;
+              font-weight: bold;
+              color: #065f46;
+              letter-spacing: 8px;
+              font-family: 'Courier New', monospace;
+            }
+            .warning {
+              background-color: #fef3c7;
+              border-left: 4px solid #f59e0b;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 5px;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 20px;
+              color: #6b7280;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Email Verification 🔐</h1>
+            </div>
+            <div class="content">
+              <h2>Hello,</h2>
+              <p>Thank you for signing up with Zynkly! To complete your registration, please verify your email address using the OTP below.</p>
+              
+              <div class="otp-box">
+                <p style="color: #065f46; margin-bottom: 10px; font-weight: 600;">Your Verification Code:</p>
+                <div class="otp-code">${otp}</div>
+              </div>
+
+              <div class="warning">
+                <p><strong>⚠️ Important:</strong></p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li>This OTP is valid for <strong>10 minutes</strong> only</li>
+                  <li>Do not share this OTP with anyone</li>
+                  <li>If you didn't request this, please ignore this email</li>
+                </ul>
+              </div>
+
+              <p>Enter this code in the verification form to complete your registration.</p>
+              
+              <p style="margin-top: 30px;">Best regards,<br>The Zynkly Team</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Zynkly. All rights reserved.</p>
+              <p>This is an automated email. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+        Email Verification - Zynkly
+        
+        Hello,
+        
+        Thank you for signing up with Zynkly! To complete your registration, please verify your email address using the OTP below.
+        
+        Your Verification Code: ${otp}
+        
+        Important:
+        - This OTP is valid for 10 minutes only
+        - Do not share this OTP with anyone
+        - If you didn't request this, please ignore this email
+        
+        Enter this code in the verification form to complete your registration.
+        
+        Best regards,
+        The Zynkly Team
+        
+        © ${new Date().getFullYear()} Zynkly. All rights reserved.
+        This is an automated email. Please do not reply to this email.
+      `,
+    };
+
+    const info = await emailTransporter.sendMail(mailOptions);
+    console.log('✅ OTP email sent to:', userEmail);
+    return info;
+  } catch (error) {
+    console.error('❌ Error sending OTP email:', error.message);
+    console.error('   Full error:', error);
+    // Mark transporter as not ready so it can be reinitialized next time
+    if (error.code === 'EAUTH' || error.code === 'ECONNECTION') {
+      transporterReady = false;
+      transporterError = error;
+    }
+    throw error; // Throw error for OTP - this is critical
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendLoginEmail,
   sendBookingConfirmationEmail,
+  sendOTPEmail,
 };
 
