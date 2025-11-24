@@ -10,6 +10,16 @@ async function testEmail() {
   console.log('  SMTP_PORT:', process.env.SMTP_PORT || '587 (default)');
   console.log('  SMTP_USER:', process.env.SMTP_USER ? '✅ SET' : '❌ NOT SET');
   console.log('  SMTP_PASS:', process.env.SMTP_PASS ? '✅ SET' : '❌ NOT SET');
+  console.log(
+    '  SMTP_SECURE:',
+    process.env.SMTP_SECURE
+      ? process.env.SMTP_SECURE === 'true'
+        ? '✅ true'
+        : '⚠️ false'
+      : process.env.SMTP_PORT === '465'
+      ? '✅ inferred true (port 465)'
+      : 'ℹ️ default false (port 587)'
+  );
   console.log('');
 
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
@@ -58,6 +68,8 @@ async function testEmail() {
 }
 
 testEmail();
+
+
 
 
 

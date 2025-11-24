@@ -11,6 +11,27 @@ let transporter = null;
 let transporterReady = false;
 let transporterError = null;
 
+const getSMTPConfig = () => {
+  const port = parseInt(process.env.SMTP_PORT, 10) || 587;
+  const secure =
+    process.env.SMTP_SECURE !== undefined
+      ? process.env.SMTP_SECURE === 'true'
+      : port === 465;
+
+  return {
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port,
+    secure,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 15000,
+  };
+};
+
 // Initialize transporter
 const initializeTransporter = async () => {
   if (!isEmailConfigured()) {
@@ -20,19 +41,13 @@ const initializeTransporter = async () => {
   }
 
   try {
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      // Add connection timeout
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
-    });
+    const smtpConfig = getSMTPConfig();
+
+    console.log(
+      `📧 Initializing email service (${smtpConfig.host}:${smtpConfig.port}, secure=${smtpConfig.secure})`
+    );
+
+    transporter = nodemailer.createTransport(smtpConfig);
 
     // Verify transporter configuration
     await new Promise((resolve, reject) => {
