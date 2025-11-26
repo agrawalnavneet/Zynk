@@ -11,6 +11,11 @@ const otpSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    enum: ['registration', 'password-reset'],
+    default: 'registration',
+  },
   expiresAt: {
     type: Date,
     required: true,
@@ -31,7 +36,7 @@ const otpSchema = new mongoose.Schema({
 });
 
 // Index for faster lookups
-otpSchema.index({ email: 1, expiresAt: 1 });
+otpSchema.index({ email: 1, type: 1, expiresAt: 1 });
 
 // Clean up expired OTPs automatically
 otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

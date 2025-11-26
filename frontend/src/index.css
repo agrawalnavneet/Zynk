@@ -20,3 +20,16 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+/* Responsive utility classes */
+@media (max-width: 640px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}

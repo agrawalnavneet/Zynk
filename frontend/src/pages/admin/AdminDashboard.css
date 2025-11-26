@@ -127,13 +127,103 @@
   border-radius: 8px;
 }
 
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-icon {
+    font-size: 40px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+}
+
 @media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 0;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-card {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .stat-icon {
+    font-size: 36px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-content h3 {
+    font-size: 12px;
   }
   
   .status-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .status-item {
+    padding: 16px;
+  }
+
+  .status-count {
+    font-size: 20px;
+    padding: 6px 12px;
+  }
+
+  .status-label {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stat-icon {
+    font-size: 32px;
+    width: 44px;
+    height: 44px;
+    margin: 0 auto;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+  
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-item {
+    padding: 12px;
   }
 }
 

@@ -76,17 +76,32 @@ const Login = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="••••••••"
-            />
-          </div>
+       <div className="form-group">
+  <label>Password</label>   {/* moved to top */}
+  <input
+    type="password"
+    name="password"
+    value={formData.password}
+    onChange={handleChange}
+    required
+    placeholder="••••••••"
+  />
+</div>
+
+<div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-0.5rem'}}>
+  <Link 
+    to="/forgot-password" 
+    style={{ 
+      fontSize: '0.875rem', 
+      color: '#10b981', 
+      textDecoration: 'none'
+    }}
+    onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+    onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+  >
+    Forgot Password?
+  </Link>
+</div>
 
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}

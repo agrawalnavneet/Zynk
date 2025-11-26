@@ -322,33 +322,64 @@
   }
 }
 
-@media (max-width: 768px) {
-  .statistics .container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+@media (max-width: 1024px) {
+  .hero {
+    padding: 4.5rem 1.5rem;
   }
 
   .hero-content h1 {
-    font-size: 2.25rem;
+    font-size: 3rem;
+  }
+
+  .statistics .container {
+    gap: 2.5rem;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .statistics .container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
   }
 
   .hero-subtitle {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
 
   .hero-badge {
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .hero-buttons {
     flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
   }
 
   .steps-grid,
-  .testimonials-grid,
-  .quick-services-grid,
-  .services-grid {
+  .testimonials-grid {
     grid-template-columns: 1fr;
+  }
+
+  .quick-services-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 
   .quick-service-item {
@@ -361,7 +392,7 @@
   .testimonials h2,
   .faq-section h2,
   .services-preview h2 {
-    font-size: 2rem;
+    font-size: 1.875rem;
   }
 }
 
@@ -559,35 +590,194 @@
   color: #6b7280;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .hero {
     padding: 3rem 1rem;
+  }
+
+  .hero-content h1 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-description {
+    font-size: 0.9375rem;
+  }
+
+  .hero-badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .container {
     padding: 0 1rem;
   }
 
+  .features,
+  .quick-services-section,
+  .how-it-works,
+  .testimonials,
+  .faq-section,
+  .services-preview,
+  .statistics {
+    padding: 2.5rem 0;
+  }
+
+  .section-header h2,
+  .features h2,
+  .how-it-works h2,
+  .testimonials h2,
+  .faq-section h2,
+  .services-preview h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.9375rem;
+  }
+
   .stat-number {
-    font-size: 2.25rem;
+    font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+
+  .stat-item {
+    padding: 1.5rem;
+  }
+
+  .quick-service-item {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .quick-service-icon {
+    font-size: 2.5rem;
+  }
+
+  .quick-service-item h3 {
+    font-size: 1.25rem;
+  }
+
+  .quick-service-price {
+    font-size: 1.125rem;
   }
 
   .quick-service-add-cart {
-    font-size: 1rem;
+    font-size: 0.9375rem;
+    padding: 0.875rem 1rem;
   }
 
   .btn,
   .btn-outline {
     width: 100%;
     text-align: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
   }
 
-  .modal-content,
   .feature,
   .faq-item,
   .testimonial,
   .step {
-    padding: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  .feature-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .step-number {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .step h3 {
+    font-size: 1.125rem;
+  }
+
+  .testimonial-content p {
+    font-size: 0.9375rem;
+  }
+
+  .author-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+
+  .faq-item h3 {
+    font-size: 1.125rem;
+  }
+
+  .services-grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9375rem;
+  }
+
+  .hero-description {
+    font-size: 0.875rem;
+  }
+
+  .hero-badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.875rem;
+  }
+
+  .features,
+  .quick-services-section,
+  .how-it-works,
+  .testimonials,
+  .faq-section,
+  .services-preview,
+  .statistics {
+    padding: 2rem 0;
+  }
+
+  .section-header h2,
+  .features h2,
+  .how-it-works h2,
+  .testimonials h2,
+  .faq-section h2,
+  .services-preview h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .quick-services-grid,
+  .features-grid,
+  .services-grid,
+  .steps-grid,
+  .testimonials-grid {
+    gap: 1.25rem;
   }
 }
 

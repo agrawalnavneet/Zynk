@@ -237,9 +237,32 @@
   border-top: 1px solid #e5e7eb;
 }
 
+@media (max-width: 1024px) {
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
+  .admin-services {
+    padding: 0;
+  }
+
   .services-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .service-admin-image {
+    height: 180px;
+  }
+
+  .service-admin-content {
+    padding: 16px;
+  }
+
+  .service-admin-header h3 {
+    font-size: 18px;
   }
   
   .form-row {
@@ -248,6 +271,67 @@
   
   .modal-content {
     max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 20px;
+  }
+
+  .modal-header h2 {
+    font-size: 20px;
+  }
+
+  .service-form {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-grid {
+    gap: 12px;
+  }
+
+  .service-admin-card {
+    border-radius: 8px;
+  }
+
+  .service-admin-image {
+    height: 160px;
+  }
+
+  .service-admin-content {
+    padding: 12px;
+  }
+
+  .service-admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .service-admin-actions {
+    flex-direction: column;
+  }
+
+  .service-admin-actions button {
+    width: 100%;
+  }
+
+  .modal-content {
+    max-height: 98vh;
+    border-radius: 8px;
+  }
+
+  .modal-header {
+    padding: 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+  }
+
+  .service-form {
+    padding: 16px;
   }
 }
 

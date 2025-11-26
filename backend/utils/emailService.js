@@ -6,20 +6,39 @@ const isEmailConfigured = () => {
   return !!(process.env.SMTP_USER && process.env.SMTP_PASS);
 };
 
+const PROVIDER_DEFAULTS = {
+  brevo: {
+    label: 'Brevo',
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false, // STARTTLS
+  },
+  gmail: {
+    label: 'Gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // STARTTLS
+  },
+};
+
 // Create transporter only if credentials are available
 let transporter = null;
 let transporterReady = false;
 let transporterError = null;
 
 const getSMTPConfig = () => {
-  const port = parseInt(process.env.SMTP_PORT, 10) || 587;
+  const providerKey = (process.env.EMAIL_PROVIDER || 'brevo').toLowerCase();
+  const provider = PROVIDER_DEFAULTS[providerKey] || PROVIDER_DEFAULTS.brevo;
+
+  const host = process.env.SMTP_HOST || provider.host;
+  const port = parseInt(process.env.SMTP_PORT, 10) || provider.port;
   const secure =
     process.env.SMTP_SECURE !== undefined
       ? process.env.SMTP_SECURE === 'true'
-      : port === 465;
+      : port === 465 || provider.secure;
 
-  return {
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  const smtpConfig = {
+    host,
     port,
     secure,
     auth: {
@@ -29,6 +48,16 @@ const getSMTPConfig = () => {
     connectionTimeout: 15000,
     greetingTimeout: 15000,
     socketTimeout: 15000,
+  };
+
+  // Force STARTTLS when secure=false but TLS is required (e.g. Brevo/Gmail on 587)
+  if (!secure) {
+    smtpConfig.requireTLS = true;
+  }
+
+  return {
+    smtpConfig,
+    providerLabel: provider.label,
   };
 };
 
@@ -41,10 +70,10 @@ const initializeTransporter = async () => {
   }
 
   try {
-    const smtpConfig = getSMTPConfig();
+    const { smtpConfig, providerLabel } = getSMTPConfig();
 
     console.log(
-      `📧 Initializing email service (${smtpConfig.host}:${smtpConfig.port}, secure=${smtpConfig.secure})`
+      `📧 Initializing email service (${providerLabel}) ${smtpConfig.host}:${smtpConfig.port}, secure=${smtpConfig.secure}`
     );
 
     transporter = nodemailer.createTransport(smtpConfig);
@@ -126,6 +155,28 @@ const getTransporter = async () => {
   return null;
 };
 
+// Get sender email address - SENDER_EMAIL is preferred, fallback to SMTP_USER
+// For Brevo: SENDER_EMAIL must be a validated sender address
+// SMTP_USER is the SMTP login and may not be a valid sender
+const getSenderEmail = () => {
+  if (process.env.SENDER_EMAIL) {
+    return process.env.SENDER_EMAIL.trim();
+  }
+  
+  // Fallback to SMTP_USER if SENDER_EMAIL not set, but warn about it
+  if (process.env.SMTP_USER) {
+    const smtpUser = process.env.SMTP_USER.trim();
+    // Warn if using Brevo and SMTP_USER looks like a Brevo SMTP login (not a real email)
+    if (smtpUser.includes('@smtp-brevo.com') || smtpUser.includes('@smtp.brevo.com')) {
+      console.warn('⚠️  WARNING: Using SMTP_USER as sender email. For Brevo, set SENDER_EMAIL to a validated sender address.');
+      console.warn('⚠️  SENDER_EMAIL should be a real email address you own and have validated in Brevo dashboard.');
+    }
+    return smtpUser;
+  }
+  
+  throw new Error('No sender email configured. Set SENDER_EMAIL or SMTP_USER in .env file.');
+};
+
 // Send welcome email on signup
 const sendWelcomeEmail = async (userEmail, userName) => {
   // Check if email is configured
@@ -146,7 +197,7 @@ const sendWelcomeEmail = async (userEmail, userName) => {
 
   try {
     const mailOptions = {
-      from: `"Zynkly" <${process.env.SMTP_USER}>`,
+      from: `"Zynkly" <${getSenderEmail()}>`,
       to: userEmail,
       subject: 'Welcome to Zynkly! 🎉',
       html: `
@@ -273,7 +324,7 @@ const sendLoginEmail = async (userEmail, userName, loginTime) => {
 
   try {
     const mailOptions = {
-      from: `"Zynkly" <${process.env.SMTP_USER}>`,
+      from: `"Zynkly" <${getSenderEmail()}>`,
       to: userEmail,
       subject: 'Login Notification - Zynkly',
       html: `
@@ -446,7 +497,7 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
     const statusName = statusNames[status] || status;
 
     const mailOptions = {
-      from: `"Zynkly" <${process.env.SMTP_USER}>`,
+      from: `"Zynkly" <${getSenderEmail()}>`,
       to: userEmail,
       subject: `Booking Confirmation - ${service.name} 🎉`,
       html: `
@@ -690,7 +741,7 @@ const sendOTPEmail = async (userEmail, otp) => {
 
   try {
     const mailOptions = {
-      from: `"Zynkly" <${process.env.SMTP_USER}>`,
+      from: `"Zynkly" <${getSenderEmail()}>`,
       to: userEmail,
       subject: 'Email Verification OTP - Zynkly',
       html: `
@@ -825,10 +876,181 @@ const sendOTPEmail = async (userEmail, otp) => {
   }
 };
 
+// Send password reset OTP email
+const sendPasswordResetOTPEmail = async (userEmail, userName, otp) => {
+  // Check if email is configured
+  if (!isEmailConfigured()) {
+    console.log('⚠️  Email not configured. Skipping password reset OTP email to:', userEmail);
+    return null;
+  }
+
+  // Get transporter (will create/verify if needed)
+  const emailTransporter = await getTransporter();
+  if (!emailTransporter) {
+    console.log('⚠️  Email transporter not available. Skipping password reset OTP email to:', userEmail);
+    if (transporterError) {
+      console.error('   Last error:', transporterError.message);
+    }
+    return null;
+  }
+
+  try {
+    const mailOptions = {
+      from: `"Zynkly" <${getSenderEmail()}>`,
+      to: userEmail,
+      subject: 'Password Reset Code - Zynkly',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #f9fafb;
+            }
+            .header {
+              background-color: #ef4444;
+              color: white;
+              padding: 30px;
+              text-align: center;
+              border-radius: 8px 8px 0 0;
+            }
+            .content {
+              background-color: white;
+              padding: 30px;
+              border-radius: 0 0 8px 8px;
+            }
+            .otp-box {
+              background-color: #fee2e2;
+              padding: 30px;
+              border-radius: 8px;
+              text-align: center;
+              margin: 30px 0;
+              border: 2px solid #ef4444;
+            }
+            .otp-code {
+              font-size: 48px;
+              font-weight: bold;
+              color: #991b1b;
+              letter-spacing: 8px;
+              font-family: 'Courier New', monospace;
+            }
+            .warning {
+              background-color: #fef3c7;
+              border-left: 4px solid #f59e0b;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 5px;
+            }
+            .danger-warning {
+              background-color: #fee2e2;
+              border-left: 4px solid #ef4444;
+              padding: 15px;
+              margin: 20px 0;
+              border-radius: 5px;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 20px;
+              color: #6b7280;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Password Reset Request 🔒</h1>
+            </div>
+            <div class="content">
+              <h2>Hello ${userName},</h2>
+              <p>We received a request to reset your password for your Zynkly account. Use the verification code below to reset your password.</p>
+              
+              <div class="otp-box">
+                <p style="color: #991b1b; margin-bottom: 10px; font-weight: 600;">Your Password Reset Code:</p>
+                <div class="otp-code">${otp}</div>
+              </div>
+
+              <div class="warning">
+                <p><strong>⚠️ Important:</strong></p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li>This code is valid for <strong>10 minutes</strong> only</li>
+                  <li>Do not share this code with anyone</li>
+                  <li>If you didn't request this, please ignore this email</li>
+                </ul>
+              </div>
+
+              <div class="danger-warning">
+                <p><strong>🔒 Security Notice:</strong></p>
+                <p>If you didn't request a password reset, please secure your account immediately. Your password will remain unchanged if you don't use this code.</p>
+              </div>
+
+              <p>Enter this code in the password reset form to create a new password.</p>
+              
+              <p style="margin-top: 30px;">Best regards,<br>The Zynkly Team</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Zynkly. All rights reserved.</p>
+              <p>This is an automated email. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+        Password Reset Request - Zynkly
+        
+        Hello ${userName},
+        
+        We received a request to reset your password for your Zynkly account. Use the verification code below to reset your password.
+        
+        Your Password Reset Code: ${otp}
+        
+        Important:
+        - This code is valid for 10 minutes only
+        - Do not share this code with anyone
+        - If you didn't request this, please ignore this email
+        
+        Security Notice:
+        If you didn't request a password reset, please secure your account immediately. Your password will remain unchanged if you don't use this code.
+        
+        Enter this code in the password reset form to create a new password.
+        
+        Best regards,
+        The Zynkly Team
+        
+        © ${new Date().getFullYear()} Zynkly. All rights reserved.
+        This is an automated email. Please do not reply to this email.
+      `,
+    };
+
+    const info = await emailTransporter.sendMail(mailOptions);
+    console.log('✅ Password reset OTP email sent to:', userEmail);
+    return info;
+  } catch (error) {
+    console.error('❌ Error sending password reset OTP email:', error.message);
+    console.error('   Full error:', error);
+    // Mark transporter as not ready so it can be reinitialized next time
+    if (error.code === 'EAUTH' || error.code === 'ECONNECTION') {
+      transporterReady = false;
+      transporterError = error;
+    }
+    throw error; // Throw error for password reset OTP - this is critical
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendLoginEmail,
   sendBookingConfirmationEmail,
   sendOTPEmail,
+  sendPasswordResetOTPEmail,
 };
 

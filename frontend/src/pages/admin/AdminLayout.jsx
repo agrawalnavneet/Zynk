@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './AdminLayout.css';
@@ -6,6 +7,7 @@ const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isActive = (path) => {
     if (path === '/admin') {
@@ -19,9 +21,23 @@ const AdminLayout = () => {
     navigate('/login');
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="admin-panel">
-      <div className="admin-sidebar">
+      <button className="admin-menu-toggle" onClick={toggleSidebar} aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      {sidebarOpen && <div className="admin-sidebar-overlay" onClick={closeSidebar}></div>}
+      <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="admin-logo">
           <h2>Zynkly Admin</h2>
         </div>
@@ -29,6 +45,7 @@ const AdminLayout = () => {
           <Link
             to="/admin"
             className={`admin-nav-link ${isActive('/') ? 'active' : ''}`}
+            onClick={closeSidebar}
           >
             <span className="nav-icon">📊</span>
             Dashboard
@@ -36,6 +53,7 @@ const AdminLayout = () => {
           <Link
             to="/admin/bookings"
             className={`admin-nav-link ${isActive('/bookings') ? 'active' : ''}`}
+            onClick={closeSidebar}
           >
             <span className="nav-icon">📅</span>
             Bookings
@@ -43,6 +61,7 @@ const AdminLayout = () => {
           <Link
             to="/admin/services"
             className={`admin-nav-link ${isActive('/services') ? 'active' : ''}`}
+            onClick={closeSidebar}
           >
             <span className="nav-icon">🔧</span>
             Services
@@ -50,6 +69,7 @@ const AdminLayout = () => {
           <Link
             to="/admin/users"
             className={`admin-nav-link ${isActive('/users') ? 'active' : ''}`}
+            onClick={closeSidebar}
           >
             <span className="nav-icon">👥</span>
             Users
@@ -65,7 +85,7 @@ const AdminLayout = () => {
             <span className="nav-icon">↩︎</span>
             Logout
           </button>
-          <Link to="/dashboard" className="admin-nav-link">
+          <Link to="/dashboard" className="admin-nav-link" onClick={closeSidebar}>
             <span className="nav-icon">🏠</span>
             User Dashboard
           </Link>
