@@ -6,13 +6,8 @@ const isEmailConfigured = () => {
   return !!(process.env.SMTP_USER && process.env.SMTP_PASS);
 };
 
+// ✅ Only Gmail provider (no Brevo)
 const PROVIDER_DEFAULTS = {
-  // brevo: {
-  //   label: 'Brevo',
-  //   host: 'smtp-relay.brevo.com',
-  //   port: 587,
-  //   secure: false, // STARTTLS
-  // },
   gmail: {
     label: 'Gmail',
     host: 'smtp.gmail.com',
@@ -21,17 +16,22 @@ const PROVIDER_DEFAULTS = {
   },
 };
 
-// Create transporter only if credentials are available
-let transporter = null;
-let transporterReady = false;
-let transporterError = null;
-
 const getSMTPConfig = () => {
-  const providerKey = (process.env.EMAIL_PROVIDER || 'brevo').toLowerCase();
-  const provider = PROVIDER_DEFAULTS[providerKey] || PROVIDER_DEFAULTS.brevo;
+  // Default: gmail
+  const providerKey = (process.env.EMAIL_PROVIDER || 'gmail').toLowerCase();
+  let provider = PROVIDER_DEFAULTS[providerKey];
+
+  // If someone sets wrong EMAIL_PROVIDER, fallback
+  if (!provider) {
+    console.warn(
+      `⚠️  Unknown EMAIL_PROVIDER "${providerKey}", falling back to Gmail.`
+    );
+    provider = PROVIDER_DEFAULTS.gmail;
+  }
 
   const host = process.env.SMTP_HOST || provider.host;
   const port = parseInt(process.env.SMTP_PORT, 10) || provider.port;
+
   const secure =
     process.env.SMTP_SECURE !== undefined
       ? process.env.SMTP_SECURE === 'true'
@@ -50,7 +50,7 @@ const getSMTPConfig = () => {
     socketTimeout: 15000,
   };
 
-  // Force STARTTLS when secure=false but TLS is required (e.g. Brevo/Gmail on 587)
+  // Force STARTTLS when secure=false
   if (!secure) {
     smtpConfig.requireTLS = true;
   }
@@ -61,11 +61,20 @@ const getSMTPConfig = () => {
   };
 };
 
+// Create transporter only if credentials are available
+let transporter = null;
+let transporterReady = false;
+let transporterError = null;
+
 // Initialize transporter
 const initializeTransporter = async () => {
   if (!isEmailConfigured()) {
-    console.log('⚠️  Email service not configured. SMTP_USER and SMTP_PASS are required in .env file.');
-    console.log('⚠️  Emails will not be sent until email credentials are configured.');
+    console.log(
+      '⚠️  Email service not configured. SMTP_USER and SMTP_PASS are required in .env file.'
+    );
+    console.log(
+      '⚠️  Emails will not be sent until email credentials are configured.'
+    );
     return false;
   }
 
@@ -79,20 +88,21 @@ const initializeTransporter = async () => {
     transporter = nodemailer.createTransport(smtpConfig);
 
     // Verify transporter configuration
-    await new Promise((resolve, reject) => {
+    await new Promise((resolve) => {
       transporter.verify((error, success) => {
         if (error) {
           transporterError = error;
           console.log('⚠️  Email service error:', error.message);
-          console.log("error is error:----",error);
-          console.log('⚠️  Emails may not beZ sent. Please check your SMTP configuration.');
-          resolve(false)
+          console.log('error is error:----', error);
+          console.log(
+            '⚠️  Emails may not be sent. Please check your SMTP configuration.'
+          );
+          resolve(false);
         } else {
           transporterReady = true;
           console.log('✅ Email service is ready to send messages');
           resolve(true);
         }
-        
       });
     });
 
@@ -123,10 +133,12 @@ const getTransporter = async () => {
   // If transporter exists but not ready, try to verify it
   if (transporter && !transporterReady) {
     try {
-      await new Promise((resolve, reject) => {
+      await new Promise((resolve) => {
         transporter.verify((error, success) => {
           if (error) {
-            console.log('⚠️  Transporter verification failed, reinitializing...');
+            console.log(
+              '⚠️  Transporter verification failed, reinitializing...'
+            );
             transporter = null;
             transporterReady = false;
             resolve(false);
@@ -158,39 +170,33 @@ const getTransporter = async () => {
 };
 
 // Get sender email address - SENDER_EMAIL is preferred, fallback to SMTP_USER
-// For Brevo: SENDER_EMAIL must be a validated sender address
-// SMTP_USER is the SMTP login and may not be a valid sender
 const getSenderEmail = () => {
   if (process.env.SENDER_EMAIL) {
     return process.env.SENDER_EMAIL.trim();
   }
-  
-  // Fallback to SMTP_USER if SENDER_EMAIL not set, but warn about it
+
   if (process.env.SMTP_USER) {
-    const smtpUser = process.env.SMTP_USER.trim();
-    // Warn if using Brevo and SMTP_USER looks like a Brevo SMTP login (not a real email)
-    if (smtpUser.includes('@smtp-brevo.com') || smtpUser.includes('@smtp.brevo.com')) {
-      console.warn('⚠️  WARNING: Using SMTP_USER as sender email. For Brevo, set SENDER_EMAIL to a validated sender address.');
-      console.warn('⚠️  SENDER_EMAIL should be a real email address you own and have validated in Brevo dashboard.');
-    }
-    return smtpUser;
+    return process.env.SMTP_USER.trim();
   }
-  
-  throw new Error('No sender email configured. Set SENDER_EMAIL or SMTP_USER in .env file.');
+
+  throw new Error(
+    'No sender email configured. Set SENDER_EMAIL or SMTP_USER in .env file.'
+  );
 };
 
 // Send welcome email on signup
 const sendWelcomeEmail = async (userEmail, userName) => {
-  // Check if email is configured
   if (!isEmailConfigured()) {
     console.log('⚠️  Email not configured. Skipping welcome email to:', userEmail);
     return null;
   }
 
-  // Get transporter (will create/verify if needed)
   const emailTransporter = await getTransporter();
   if (!emailTransporter) {
-    console.log('⚠️  Email transporter not available. Skipping welcome email to:', userEmail);
+    console.log(
+      '⚠️  Email transporter not available. Skipping welcome email to:',
+      userEmail
+    );
     if (transporterError) {
       console.error('   Last error:', transporterError.message);
     }
@@ -207,44 +213,12 @@ const sendWelcomeEmail = async (userEmail, userName) => {
         <html>
         <head>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-              background-color: #f9fafb;
-            }
-            .header {
-              background-color: #10b981;
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 8px 8px 0 0;
-            }
-            .content {
-              background-color: white;
-              padding: 30px;
-              border-radius: 0 0 8px 8px;
-            }
-            .button {
-              display: inline-block;
-              padding: 12px 24px;
-              background-color: #10b981;
-              color: white;
-              text-decoration: none;
-              border-radius: 5px;
-              margin-top: 20px;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 20px;
-              color: #6b7280;
-              font-size: 12px;
-            }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; }
+            .header { background-color: #10b981; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: white; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; padding: 12px 24px; background-color: #10b981; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
           </style>
         </head>
         <body>
@@ -273,18 +247,13 @@ const sendWelcomeEmail = async (userEmail, userName) => {
       `,
       text: `
         Welcome to Zynkly!
-        
         Hello ${userName},
-        
         Thank you for signing up with Zynkly! We're excited to have you on board.
-        
         Your account has been successfully created. You can now:
         - Browse our cleaning services
         - Book appointments at your convenience
         - Manage your bookings from your dashboard
-        
         If you have any questions or need assistance, feel free to reach out to us.
-        
         Best regards,
         The Zynkly Team
       `,
@@ -296,28 +265,27 @@ const sendWelcomeEmail = async (userEmail, userName) => {
   } catch (error) {
     console.error('❌ Error sending welcome email:', error.message);
     console.error('   Full error:', error);
-    // Mark transporter as not ready so it can be reinitialized next time
     if (error.code === 'EAUTH' || error.code === 'ECONNECTION') {
       transporterReady = false;
       transporterError = error;
     }
-    // Don't throw error - allow registration to succeed even if email fails
     return null;
   }
 };
 
 // Send login notification email
 const sendLoginEmail = async (userEmail, userName, loginTime) => {
-  // Check if email is configured
   if (!isEmailConfigured()) {
     console.log('⚠️  Email not configured. Skipping login email to:', userEmail);
     return null;
   }
 
-  // Get transporter (will create/verify if needed)
   const emailTransporter = await getTransporter();
   if (!emailTransporter) {
-    console.log('⚠️  Email transporter not available. Skipping login email to:', userEmail);
+    console.log(
+      '⚠️  Email transporter not available. Skipping login email to:',
+      userEmail
+    );
     if (transporterError) {
       console.error('   Last error:', transporterError.message);
     }
@@ -334,47 +302,13 @@ const sendLoginEmail = async (userEmail, userName, loginTime) => {
         <html>
         <head>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-              background-color: #f9fafb;
-            }
-            .header {
-              background-color: #10b981;
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 8px 8px 0 0;
-            }
-            .content {
-              background-color: white;
-              padding: 30px;
-              border-radius: 0 0 8px 8px;
-            }
-            .info-box {
-              background-color: #f3f4f6;
-              padding: 15px;
-              border-radius: 5px;
-              margin: 20px 0;
-            }
-            .warning {
-              background-color: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 15px;
-              margin: 20px 0;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 20px;
-              color: #6b7280;
-              font-size: 12px;
-            }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; }
+            .header { background-color: #10b981; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: white; padding: 30px; border-radius: 0 0 8px 8px; }
+            .info-box { background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0; }
+            .warning { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 5px; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
           </style>
         </head>
         <body>
@@ -404,18 +338,12 @@ const sendLoginEmail = async (userEmail, userName, loginTime) => {
       `,
       text: `
         Login Notification
-        
         Hello ${userName},
-        
         This is to notify you that you have successfully logged into your Zynkly account.
-        
         Login Time: ${loginTime}
-        
         Security Notice:
         If you did not perform this login, please change your password immediately and contact our support team.
-        
         If you have any concerns about your account security, please don't hesitate to reach out to us.
-        
         Best regards,
         The Zynkly Team
       `,
@@ -427,28 +355,34 @@ const sendLoginEmail = async (userEmail, userName, loginTime) => {
   } catch (error) {
     console.error('❌ Error sending login email:', error.message);
     console.error('   Full error:', error);
-    // Mark transporter as not ready so it can be reinitialized next time
     if (error.code === 'EAUTH' || error.code === 'ECONNECTION') {
       transporterReady = false;
       transporterError = error;
     }
-    // Don't throw error - allow login to succeed even if email fails
     return null;
   }
 };
 
 // Send booking confirmation email
-const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) => {
-  // Check if email is configured
+const sendBookingConfirmationEmail = async (
+  userEmail,
+  userName,
+  bookingData
+) => {
   if (!isEmailConfigured()) {
-    console.log('⚠️  Email not configured. Skipping booking confirmation email to:', userEmail);
+    console.log(
+      '⚠️  Email not configured. Skipping booking confirmation email to:',
+      userEmail
+    );
     return null;
   }
 
-  // Get transporter (will create/verify if needed)
   const emailTransporter = await getTransporter();
   if (!emailTransporter) {
-    console.log('⚠️  Email transporter not available. Skipping booking confirmation email to:', userEmail);
+    console.log(
+      '⚠️  Email transporter not available. Skipping booking confirmation email to:',
+      userEmail
+    );
     if (transporterError) {
       console.error('   Last error:', transporterError.message);
     }
@@ -456,9 +390,18 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
   }
 
   try {
-    const { service, date, time, address, totalPrice, plan, bookingType, status, specialInstructions } = bookingData;
-    
-    // Format date
+    const {
+      service,
+      date,
+      time,
+      address,
+      totalPrice,
+      plan,
+      bookingType,
+      status,
+      specialInstructions,
+    } = bookingData;
+
     const bookingDate = new Date(date).toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
@@ -466,35 +409,31 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
       day: 'numeric',
     });
 
-    // Format address
     const fullAddress = `${address.street}, ${address.city}, ${address.state} ${address.zipCode}`;
 
-    // Format plan name
     const planNames = {
       'one-time': 'One-time',
-      'hourly': 'Hourly',
-      'daily': 'Daily',
-      'weekly': 'Weekly',
-      'monthly': 'Monthly',
-      'yearly': 'Yearly',
+      hourly: 'Hourly',
+      daily: 'Daily',
+      weekly: 'Weekly',
+      monthly: 'Monthly',
+      yearly: 'Yearly',
     };
     const planName = planNames[plan] || plan;
 
-    // Format booking type
     const bookingTypeNames = {
-      'instant': 'Instant',
-      'scheduled': 'Scheduled',
-      'recurring': 'Recurring',
+      instant: 'Instant',
+      scheduled: 'Scheduled',
+      recurring: 'Recurring',
     };
     const bookingTypeName = bookingTypeNames[bookingType] || bookingType;
 
-    // Format status
     const statusNames = {
-      'pending': 'Pending',
-      'confirmed': 'Confirmed',
+      pending: 'Pending',
+      confirmed: 'Confirmed',
       'in-progress': 'In Progress',
-      'completed': 'Completed',
-      'cancelled': 'Cancelled',
+      completed: 'Completed',
+      cancelled: 'Cancelled',
     };
     const statusName = statusNames[status] || status;
 
@@ -507,91 +446,40 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
         <html>
         <head>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-              background-color: #f9fafb;
-            }
-            .header {
-              background-color: #10b981;
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 8px 8px 0 0;
-            }
-            .content {
-              background-color: white;
-              padding: 30px;
-              border-radius: 0 0 8px 8px;
-            }
-            .info-box {
-              background-color: #f3f4f6;
-              padding: 20px;
-              border-radius: 5px;
-              margin: 20px 0;
-            }
-            .info-row {
-              display: flex;
-              justify-content: space-between;
-              padding: 10px 0;
-              border-bottom: 1px solid #e5e7eb;
-            }
-            .info-row:last-child {
-              border-bottom: none;
-            }
-            .info-label {
-              font-weight: bold;
-              color: #6b7280;
-            }
-            .info-value {
-              color: #111827;
-              text-align: right;
-            }
-            .service-name {
-              font-size: 24px;
-              color: #10b981;
-              font-weight: bold;
-              margin: 20px 0;
-            }
-            .price-box {
-              background-color: #d1fae5;
-              padding: 20px;
-              border-radius: 5px;
-              text-align: center;
-              margin: 20px 0;
-            }
-            .price-amount {
-              font-size: 32px;
-              font-weight: bold;
-              color: #065f46;
-            }
-            .address-box {
-              background-color: #fef3c7;
-              padding: 15px;
-              border-left: 4px solid #f59e0b;
-              margin: 20px 0;
-              border-radius: 5px;
-            }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; }
+            .header { background-color: #10b981; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: white; padding: 30px; border-radius: 0 0 8px 8px; }
+            .info-box { background-color: #f3f4f6; padding: 20px; border-radius: 5px; margin: 20px 0; }
+            .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
+            .info-row:last-child { border-bottom: none; }
+            .info-label { font-weight: bold; color: #6b7280; }
+            .info-value { color: #111827; text-align: right; }
+            .service-name { font-size: 24px; color: #10b981; font-weight: bold; margin: 20px 0; }
+            .price-box { background-color: #d1fae5; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0; }
+            .price-amount { font-size: 32px; font-weight: bold; color: #065f46; }
+            .address-box { background-color: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 5px; }
             .status-badge {
               display: inline-block;
               padding: 8px 16px;
               border-radius: 20px;
               font-weight: bold;
-              background-color: ${status === 'confirmed' ? '#d1fae5' : status === 'pending' ? '#dbeafe' : '#fee2e2'};
-              color: ${status === 'confirmed' ? '#065f46' : status === 'pending' ? '#1e40af' : '#991b1b'};
+              background-color: ${
+                status === 'confirmed'
+                  ? '#d1fae5'
+                  : status === 'pending'
+                  ? '#dbeafe'
+                  : '#fee2e2'
+              };
+              color: ${
+                status === 'confirmed'
+                  ? '#065f46'
+                  : status === 'pending'
+                  ? '#1e40af'
+                  : '#991b1b'
+              };
             }
-            .footer {
-              text-align: center;
-              margin-top: 20px;
-              color: #6b7280;
-              font-size: 12px;
-            }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
             .instructions {
               background-color: #eff6ff;
               padding: 15px;
@@ -609,7 +497,6 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
             <div class="content">
               <h2>Hello ${userName},</h2>
               <p>Thank you for booking with Zynkly! Your booking has been confirmed and we're excited to serve you.</p>
-              
               <div class="service-name">${service.name}</div>
               <p style="color: #6b7280;">${service.description}</p>
 
@@ -650,17 +537,19 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
                 <p style="margin: 0; color: #78350f;">${fullAddress}</p>
               </div>
 
-              ${specialInstructions ? `
+              ${
+                specialInstructions
+                  ? `
               <div class="instructions">
                 <strong style="color: #1e40af; margin-bottom: 10px; display: block;">Special Instructions:</strong>
                 <p style="margin: 0; color: #1e3a8a;">${specialInstructions}</p>
               </div>
-              ` : ''}
+              `
+                  : ''
+              }
 
               <p style="margin-top: 30px;">We'll send you a reminder before your scheduled service. If you need to make any changes to your booking, please contact us or visit your dashboard.</p>
-              
               <p style="margin-top: 20px;">Thank you for choosing Zynkly. We look forward to serving you!</p>
-              
               <p style="margin-top: 20px;">Best regards,<br>The Zynkly Team</p>
             </div>
             <div class="footer">
@@ -673,14 +562,10 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
       `,
       text: `
         Booking Confirmed!
-        
         Hello ${userName},
-        
         Thank you for booking with Zynkly! Your booking has been confirmed and we're excited to serve you.
-        
         Service: ${service.name}
         ${service.description}
-        
         Booking Details:
         - Status: ${statusName}
         - Booking Date: ${bookingDate}
@@ -689,19 +574,17 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
         - Booking Type: ${bookingTypeName}
         - Service Duration: ${service.duration} minutes
         - Total Amount: ₹${totalPrice.toLocaleString('en-IN')}
-        
         Service Address:
         ${fullAddress}
-        
-        ${specialInstructions ? `Special Instructions:\n${specialInstructions}\n\n` : ''}
-        
+        ${
+          specialInstructions
+            ? `Special Instructions:\n${specialInstructions}\n\n`
+            : ''
+        }
         We'll send you a reminder before your scheduled service. If you need to make any changes to your booking, please contact us or visit your dashboard.
-        
         Thank you for choosing Zynkly. We look forward to serving you!
-        
         Best regards,
         The Zynkly Team
-        
         © ${new Date().getFullYear()} Zynkly. All rights reserved.
         This is an automated confirmation email. Please do not reply to this email.
       `,
@@ -711,30 +594,32 @@ const sendBookingConfirmationEmail = async (userEmail, userName, bookingData) =>
     console.log('✅ Booking confirmation email sent to:', userEmail);
     return info;
   } catch (error) {
-    console.error('❌ Error sending booking confirmation email:', error.message);
+    console.error(
+      '❌ Error sending booking confirmation email:',
+      error.message
+    );
     console.error('   Full error:', error);
-    // Mark transporter as not ready so it can be reinitialized next time
     if (error.code === 'EAUTH' || error.code === 'ECONNECTION') {
       transporterReady = false;
       transporterError = error;
     }
-    // Don't throw error - allow booking to succeed even if email fails
     return null;
   }
 };
 
 // Send OTP email for email verification
 const sendOTPEmail = async (userEmail, otp) => {
-  // Check if email is configured
   if (!isEmailConfigured()) {
     console.log('⚠️  Email not configured. Skipping OTP email to:', userEmail);
     return null;
   }
 
-  // Get transporter (will create/verify if needed)
   const emailTransporter = await getTransporter();
   if (!emailTransporter) {
-    console.log('⚠️  Email transporter not available. Skipping OTP email to:', userEmail);
+    console.log(
+      '⚠️  Email transporter not available. Skipping OTP email to:',
+      userEmail
+    );
     if (transporterError) {
       console.error('   Last error:', transporterError.message);
     }
@@ -751,57 +636,14 @@ const sendOTPEmail = async (userEmail, otp) => {
         <html>
         <head>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-              background-color: #f9fafb;
-            }
-            .header {
-              background-color: #10b981;
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 8px 8px 0 0;
-            }
-            .content {
-              background-color: white;
-              padding: 30px;
-              border-radius: 0 0 8px 8px;
-            }
-            .otp-box {
-              background-color: #d1fae5;
-              padding: 30px;
-              border-radius: 8px;
-              text-align: center;
-              margin: 30px 0;
-              border: 2px solid #10b981;
-            }
-            .otp-code {
-              font-size: 48px;
-              font-weight: bold;
-              color: #065f46;
-              letter-spacing: 8px;
-              font-family: 'Courier New', monospace;
-            }
-            .warning {
-              background-color: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 5px;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 20px;
-              color: #6b7280;
-              font-size: 12px;
-            }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; }
+            .header { background-color: #10b981; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: white; padding: 30px; border-radius: 0 0 8px 8px; }
+            .otp-box { background-color: #d1fae5; padding: 30px; border-radius: 8px; text-align: center; margin: 30px 0; border: 2px solid #10b981; }
+            .otp-code { font-size: 48px; font-weight: bold; color: #065f46; letter-spacing: 8px; font-family: 'Courier New', monospace; }
+            .warning { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 5px; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
           </style>
         </head>
         <body>
@@ -812,7 +654,6 @@ const sendOTPEmail = async (userEmail, otp) => {
             <div class="content">
               <h2>Hello,</h2>
               <p>Thank you for signing up with Zynkly! To complete your registration, please verify your email address using the OTP below.</p>
-              
               <div class="otp-box">
                 <p style="color: #065f46; margin-bottom: 10px; font-weight: 600;">Your Verification Code:</p>
                 <div class="otp-code">${otp}</div>
@@ -828,7 +669,6 @@ const sendOTPEmail = async (userEmail, otp) => {
               </div>
 
               <p>Enter this code in the verification form to complete your registration.</p>
-              
               <p style="margin-top: 30px;">Best regards,<br>The Zynkly Team</p>
             </div>
             <div class="footer">
@@ -841,23 +681,16 @@ const sendOTPEmail = async (userEmail, otp) => {
       `,
       text: `
         Email Verification - Zynkly
-        
         Hello,
-        
         Thank you for signing up with Zynkly! To complete your registration, please verify your email address using the OTP below.
-        
         Your Verification Code: ${otp}
-        
         Important:
         - This OTP is valid for 10 minutes only
         - Do not share this OTP with anyone
         - If you didn't request this, please ignore this email
-        
         Enter this code in the verification form to complete your registration.
-        
         Best regards,
         The Zynkly Team
-        
         © ${new Date().getFullYear()} Zynkly. All rights reserved.
         This is an automated email. Please do not reply to this email.
       `,
@@ -869,27 +702,30 @@ const sendOTPEmail = async (userEmail, otp) => {
   } catch (error) {
     console.error('❌ Error sending OTP email:', error.message);
     console.error('   Full error:', error);
-    // Mark transporter as not ready so it can be reinitialized next time
     if (error.code === 'EAUTH' || error.code === 'ECONNECTION') {
       transporterReady = false;
       transporterError = error;
     }
-    throw error; // Throw error for OTP - this is critical
+    throw error; // OTP is critical
   }
 };
 
 // Send password reset OTP email
 const sendPasswordResetOTPEmail = async (userEmail, userName, otp) => {
-  // Check if email is configured
   if (!isEmailConfigured()) {
-    console.log('⚠️  Email not configured. Skipping password reset OTP email to:', userEmail);
+    console.log(
+      '⚠️  Email not configured. Skipping password reset OTP email to:',
+      userEmail
+    );
     return null;
   }
 
-  // Get transporter (will create/verify if needed)
   const emailTransporter = await getTransporter();
   if (!emailTransporter) {
-    console.log('⚠️  Email transporter not available. Skipping password reset OTP email to:', userEmail);
+    console.log(
+      '⚠️  Email transporter not available. Skipping password reset OTP email to:',
+      userEmail
+    );
     if (transporterError) {
       console.error('   Last error:', transporterError.message);
     }
@@ -906,64 +742,15 @@ const sendPasswordResetOTPEmail = async (userEmail, userName, otp) => {
         <html>
         <head>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-              background-color: #f9fafb;
-            }
-            .header {
-              background-color: #ef4444;
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 8px 8px 0 0;
-            }
-            .content {
-              background-color: white;
-              padding: 30px;
-              border-radius: 0 0 8px 8px;
-            }
-            .otp-box {
-              background-color: #fee2e2;
-              padding: 30px;
-              border-radius: 8px;
-              text-align: center;
-              margin: 30px 0;
-              border: 2px solid #ef4444;
-            }
-            .otp-code {
-              font-size: 48px;
-              font-weight: bold;
-              color: #991b1b;
-              letter-spacing: 8px;
-              font-family: 'Courier New', monospace;
-            }
-            .warning {
-              background-color: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 5px;
-            }
-            .danger-warning {
-              background-color: #fee2e2;
-              border-left: 4px solid #ef4444;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 5px;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 20px;
-              color: #6b7280;
-              font-size: 12px;
-            }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; }
+            .header { background-color: #ef4444; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: white; padding: 30px; border-radius: 0 0 8px 8px; }
+            .otp-box { background-color: #fee2e2; padding: 30px; border-radius: 8px; text-align: center; margin: 30px 0; border: 2px solid #ef4444; }
+            .otp-code { font-size: 48px; font-weight: bold; color: #991b1b; letter-spacing: 8px; font-family: 'Courier New', monospace; }
+            .warning { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 5px; }
+            .danger-warning { background-color: #fee2e2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 5px; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
           </style>
         </head>
         <body>
@@ -974,7 +761,6 @@ const sendPasswordResetOTPEmail = async (userEmail, userName, otp) => {
             <div class="content">
               <h2>Hello ${userName},</h2>
               <p>We received a request to reset your password for your Zynkly account. Use the verification code below to reset your password.</p>
-              
               <div class="otp-box">
                 <p style="color: #991b1b; margin-bottom: 10px; font-weight: 600;">Your Password Reset Code:</p>
                 <div class="otp-code">${otp}</div>
@@ -995,7 +781,6 @@ const sendPasswordResetOTPEmail = async (userEmail, userName, otp) => {
               </div>
 
               <p>Enter this code in the password reset form to create a new password.</p>
-              
               <p style="margin-top: 30px;">Best regards,<br>The Zynkly Team</p>
             </div>
             <div class="footer">
@@ -1008,26 +793,18 @@ const sendPasswordResetOTPEmail = async (userEmail, userName, otp) => {
       `,
       text: `
         Password Reset Request - Zynkly
-        
         Hello ${userName},
-        
         We received a request to reset your password for your Zynkly account. Use the verification code below to reset your password.
-        
         Your Password Reset Code: ${otp}
-        
         Important:
         - This code is valid for 10 minutes only
         - Do not share this code with anyone
         - If you didn't request this, please ignore this email
-        
         Security Notice:
         If you didn't request a password reset, please secure your account immediately. Your password will remain unchanged if you don't use this code.
-        
         Enter this code in the password reset form to create a new password.
-        
         Best regards,
         The Zynkly Team
-        
         © ${new Date().getFullYear()} Zynkly. All rights reserved.
         This is an automated email. Please do not reply to this email.
       `,
@@ -1037,14 +814,16 @@ const sendPasswordResetOTPEmail = async (userEmail, userName, otp) => {
     console.log('✅ Password reset OTP email sent to:', userEmail);
     return info;
   } catch (error) {
-    console.error('❌ Error sending password reset OTP email:', error.message);
+    console.error(
+      '❌ Error sending password reset OTP email:',
+      error.message
+    );
     console.error('   Full error:', error);
-    // Mark transporter as not ready so it can be reinitialized next time
     if (error.code === 'EAUTH' || error.code === 'ECONNECTION') {
       transporterReady = false;
       transporterError = error;
     }
-    throw error; // Throw error for password reset OTP - this is critical
+    throw error; // critical
   }
 };
 
@@ -1055,4 +834,3 @@ module.exports = {
   sendOTPEmail,
   sendPasswordResetOTPEmail,
 };
-
