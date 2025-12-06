@@ -7,12 +7,12 @@ const isEmailConfigured = () => {
 };
 
 const PROVIDER_DEFAULTS = {
-  brevo: {
-    label: 'Brevo',
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false, // STARTTLS
-  },
+  // brevo: {
+  //   label: 'Brevo',
+  //   host: 'smtp-relay.brevo.com',
+  //   port: 587,
+  //   secure: false, // STARTTLS
+  // },
   gmail: {
     label: 'Gmail',
     host: 'smtp.gmail.com',
@@ -84,13 +84,15 @@ const initializeTransporter = async () => {
         if (error) {
           transporterError = error;
           console.log('⚠️  Email service error:', error.message);
-          console.log('⚠️  Emails may not be sent. Please check your SMTP configuration.');
-          resolve(false);
+          console.log("error is error:----",error);
+          console.log('⚠️  Emails may not beZ sent. Please check your SMTP configuration.');
+          resolve(false)
         } else {
           transporterReady = true;
           console.log('✅ Email service is ready to send messages');
           resolve(true);
         }
+        
       });
     });
 
