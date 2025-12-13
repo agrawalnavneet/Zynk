@@ -85,29 +85,29 @@ const ServiceDetail = () => {
             <div className="service-details">
               <div className="detail-item">
                 <span className="detail-label">One-Time Price:</span>
-                <span className="detail-value">${service.price}</span>
+                <span className="detail-value">₹{service.price}</span>
               </div>
               {service.pricingPlans && Object.keys(service.pricingPlans).some(key => service.pricingPlans[key] !== null) && (
                 <div className="detail-item plans-section">
                   <span className="detail-label">Available Plans:</span>
                   <div className="plans-preview">
                     {service.pricingPlans.hourly && (
-                      <span className="plan-badge">Hourly: ${service.pricingPlans.hourly}</span>
+                      <span className="plan-badge">Hourly: ₹{service.pricingPlans.hourly}</span>
                     )}
                     {service.pricingPlans.daily && (
-                      <span className="plan-badge">Daily: ${service.pricingPlans.daily}</span>
+                      <span className="plan-badge">Daily: ₹{service.pricingPlans.daily}</span>
                     )}
                     {service.pricingPlans.weekly && (
-                      <span className="plan-badge">Weekly: ${service.pricingPlans.weekly}</span>
+                      <span className="plan-badge">Weekly: ₹{service.pricingPlans.weekly}</span>
                     )}
                     {service.pricingPlans.monthly && (
-                      <span className="plan-badge">Monthly: ${service.pricingPlans.monthly}</span>
+                      <span className="plan-badge">Monthly: ₹{service.pricingPlans.monthly}</span>
                     )}
                     {service.pricingPlans.yearly && (
-                      <span className="plan-badge">Yearly: ${service.pricingPlans.yearly}</span>
+                      <span className="plan-badge">Yearly: ₹{service.pricingPlans.yearly}</span>
                     )}
                   </div>
-                </div>
+                </div>  
               )}
               <div className="detail-item">
                 <span className="detail-label">Duration:</span>
