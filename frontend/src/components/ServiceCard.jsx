@@ -1,16 +1,18 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import AddToCartModal from './AddToCartModal';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import './ServiceCard.css';
 
 const ServiceCard = ({ service }) => {
-  const [showModal, setShowModal] = useState(false);
+  const { addToCart } = useCart();
+  const { showToast } = useToast();
   const isQuickService = service.isQuickService || service.duration === 15;
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setShowModal(true);
+    addToCart(service, 'one-time');
+    showToast(`✅ ${service.name} added to cart!`, 'success');
   };
   
   return (
@@ -39,11 +41,6 @@ const ServiceCard = ({ service }) => {
           </button>
         </div>
       </div>
-      <AddToCartModal 
-        service={service} 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
-      />
     </div>
   );
 };
