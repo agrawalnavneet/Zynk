@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext, useRef } from 'react';
 import api from '../utils/api';
 
 const AuthContext = createContext();
@@ -15,14 +15,54 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const logoutTimerRef = useRef(null);
+
+  const clearLogoutTimer = () => {
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+  };
+
+  const handleLogout = (redirectToLogin = true) => {
+    clearLogoutTimer();
+    localStorage.removeItem('token');
+    localStorage.removeItem('tokenExpiry');
+    setUser(null);
+    setLoading(false);
+    if (redirectToLogin) {
+      // Router is nested inside AuthProvider; window redirect is safest here
+      window.location.href = '/login';
+    }
+  };
+
+  const scheduleAutoLogout = (expiryTimestamp) => {
+    clearLogoutTimer();
+    const remainingMs = expiryTimestamp - Date.now();
+    if (remainingMs <= 0) {
+      handleLogout();
+      return;
+    }
+    logoutTimerRef.current = setTimeout(() => handleLogout(), remainingMs);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
+    const expiry = parseInt(localStorage.getItem('tokenExpiry') || '', 10);
+
+    if (token && expiry) {
+      if (Date.now() >= expiry) {
+        handleLogout();
+        return;
+      }
+      scheduleAutoLogout(expiry);
       fetchUser();
     } else {
-      setLoading(false);
+      handleLogout(false);
     }
+
+    return () => clearLogoutTimer();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUser = async () => {
@@ -30,9 +70,8 @@ export const AuthProvider = ({ children }) => {
       const res = await api.get('/auth/me');
       setUser(res.data);
     } catch (error) {
-      localStorage.removeItem('token');
-      setUser(null);
       console.error('Failed to fetch current user:', error);
+      handleLogout(false);
     } finally {
       setLoading(false);
     }
@@ -43,6 +82,9 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/auth/login', { email, password });
       if (res.data.token && res.data.user) {
         localStorage.setItem('token', res.data.token);
+        const expiry = Date.now() + 3 * 60 * 1000; // 3 minutes
+        localStorage.setItem('tokenExpiry', expiry.toString());
+        scheduleAutoLogout(expiry);
         setUser(res.data.user);
         return res.data;
       } else {
@@ -59,6 +101,9 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/auth/register', { name, email, password, phone });
       if (res.data.token && res.data.user) {
         localStorage.setItem('token', res.data.token);
+        const expiry = Date.now() + 3 * 60 * 1000; // 3 minutes
+        localStorage.setItem('tokenExpiry', expiry.toString());
+        scheduleAutoLogout(expiry);
         setUser(res.data.user);
         return res.data;
       } else {
@@ -71,8 +116,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
+    handleLogout(false);
   };
 
   return (
