@@ -492,7 +492,7 @@ const sendBookingConfirmationEmail = async (
         <body>
           <div class="container">
             <div class="header">
-              <h1>Booking Confirmed! 🎉</h1>
+              <h1>Booking Status! 🎉</h1>
             </div>
             <div class="content">
               <h2>Hello ${userName},</h2>
