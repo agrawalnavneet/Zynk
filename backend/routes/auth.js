@@ -210,7 +210,7 @@ router.post(
       // Generate token
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
         // Match frontend session timeout
-        expiresIn: '3m',
+        expiresIn: '3600m',
       });
 
       // Send login notification email (non-blocking)

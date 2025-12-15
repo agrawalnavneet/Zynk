@@ -90,15 +90,15 @@ const Home = () => {
       <section className="statistics">
         <div className="container">
           <div className="stat-item">
-            <div className="stat-number">99,950+</div>
+            <div className="stat-number">99+</div>
             <div className="stat-label">Homes cleaned</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">84,950+</div>
+            <div className="stat-number">215+</div>
             <div className="stat-label">Hours saved</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">955+</div>
+            <div className="stat-number">50+</div>
             <div className="stat-label">Zynkly professionals</div>
           </div>
         </div>
