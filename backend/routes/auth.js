@@ -150,7 +150,7 @@ router.post(
       // Generate token
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
         // Short session to force frontend logout after 3 minutes
-        expiresIn: '3m',
+        expiresIn: '3600m',
       });
 
       // Send welcome email (non-blocking)
