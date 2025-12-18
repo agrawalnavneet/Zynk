@@ -87,6 +87,17 @@ const Home = () => {
         </div>
       </section>
 
+
+
+
+
+
+
+
+
+
+      {/* testonomials
+
       <section className="statistics">
         <div className="container">
           <div className="stat-item">
@@ -102,9 +113,11 @@ const Home = () => {
             <div className="stat-label">Zynkly professionals</div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <section className="features">
+
+{/* why choose us */}
+      {/* <section className="features">
         <div className="container">
           <h2>Why Choose Us?</h2>
           <div className="features-grid">
@@ -130,9 +143,11 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <section className="quick-services-section">
+
+{/* Quick 15 minutes services*/}
+      {/* <section className="quick-services-section">
         <div className="container">
           <div className="section-header">
             <h2>Quick Services - 15 Minutes</h2>
@@ -235,8 +250,10 @@ const Home = () => {
             />
           )}
         </div>
-      </section>
+      </section> */}
 
+{/* all our services */}
+     
       <section className="services-preview">
         <div className="container">
           <h2>All Our Services</h2>
@@ -254,6 +271,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+{/* simple steps to a clean */}
 
       <section className="how-it-works">
         <div className="container">
@@ -279,6 +298,58 @@ const Home = () => {
         </div>
       </section>
 
+  {/* testonomials */}
+
+      <section className="statistics">
+        <div className="container">
+          <div className="stat-item">
+            <div className="stat-number">99+</div>
+            <div className="stat-label">Homes cleaned</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">215+</div>
+            <div className="stat-label">Hours saved</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">50+</div>
+            <div className="stat-label">Zynkly professionals</div>
+          </div>
+        </div>
+      </section>
+
+      
+{/* why choose us */}
+      <section className="features">
+        <div className="container">
+          <h2>Why Choose Us?</h2>
+          <div className="features-grid">
+            <div className="feature">
+              <div className="feature-icon">✓</div>
+              <h3>Professional Cleaners</h3>
+              <p>Experienced and trained professionals</p>
+            </div>
+            <div className="feature">
+              <div className="feature-icon">✓</div>
+              <h3>Flexible Scheduling</h3>
+              <p>Book at your convenience</p>
+            </div>
+            <div className="feature">
+              <div className="feature-icon">✓</div>
+              <h3>Affordable Prices</h3>
+              <p>Competitive pricing for quality service</p>
+            </div>
+            <div className="feature">
+              <div className="feature-icon">✓</div>
+              <h3>100% Satisfaction</h3>
+              <p>Guaranteed quality service</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+     
+
+{/* user review and feedback */}
       <section className="testimonials">
         <div className="container">
           <h2>User Reviews and Feedback</h2>
@@ -336,6 +407,119 @@ const Home = () => {
         </div>
       </section>
 
+
+
+{/* Quick 15 minutes services*/}
+      <section className="quick-services-section">
+        <div className="container">
+          <div className="section-header">
+            <h2> Coming Soon</h2>
+    
+            <h2>Quick Services - 15 Minutes</h2>
+            <p className="section-subtitle">Get professional cleaning in just 15 minutes!</p>
+          </div>
+          <div className="quick-services-grid">
+            {(() => {
+              const bathroomService = getQuickService('Bathroom Cleaning');
+              return (
+                <div className="quick-service-item">
+                  <div className="quick-service-icon">🚿</div>
+                  <h3>Bathroom Cleaning</h3>
+                  <p>Sanitization, scrubbing, and mirror cleaning</p>
+                  <div className="quick-service-price">Starting at ₹{bathroomService?.price || 35}</div>
+                  <div className="quick-service-time">⚡ 15 Minutes</div>
+                  <div className="quick-service-actions">
+                    <button 
+                      onClick={() => handleAddToCart('Bathroom Cleaning')} 
+                      className="quick-service-add-cart"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            
+            {(() => {
+              const roomService = getQuickService('Room Cleaning');
+              return (
+                <div className="quick-service-item">
+                  <div className="quick-service-icon">🛏️</div>
+                  <h3>Room Cleaning</h3>
+                  <p>Dusting, vacuuming, bed making, and organizing</p>
+                  <div className="quick-service-price">Starting at ₹{roomService?.price || 40}</div>
+                  <div className="quick-service-time">⚡ 15 Minutes</div>
+                  <div className="quick-service-actions">
+                    <button 
+                      onClick={() => handleAddToCart('Room Cleaning')} 
+                      className="quick-service-add-cart"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            
+            {(() => {
+              const kitchenService = getQuickService('Kitchen Cleaning');
+              return (
+                <div className="quick-service-item">
+                  <div className="quick-service-icon">🍳</div>
+                  <h3>Kitchen Cleaning</h3>
+                  <p>Counter cleaning, appliance wiping, and sanitization</p>
+                  <div className="quick-service-price">Starting at ₹{kitchenService?.price || 45}</div>
+                  <div className="quick-service-time">⚡ 15 Minutes</div>
+                  <div className="quick-service-actions">
+                    <button 
+                      onClick={() => handleAddToCart('Kitchen Cleaning')} 
+                      className="quick-service-add-cart"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            
+            {(() => {
+              const laundryService = getQuickService('Laundry Services');
+              return (
+                <div className="quick-service-item">
+                  <div className="quick-service-icon">👔</div>
+                  <h3>Laundry Services</h3>
+                  <p>Wash, dry, and fold - all in 15 minutes!</p>
+                  <div className="quick-service-price">Starting at ₹{laundryService?.price || 30}</div>
+                  <div className="quick-service-time">⚡ 15 Minutes</div>
+                  <div className="quick-service-actions">
+                    <button 
+                      onClick={() => handleAddToCart('Laundry Services')} 
+                      className="quick-service-add-cart"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+          
+          {selectedService && (
+            <AddToCartModal 
+              service={selectedService} 
+              isOpen={showModal} 
+              onClose={() => {
+                setShowModal(false);
+                setSelectedService(null);
+              }} 
+            />
+          )}
+        </div>
+      </section>
+
+
+
+{/* frequently asked quetions */}
       <section className="faq-section">
         <div className="container">
           <h2>Frequently Asked Questions</h2>
