@@ -36,8 +36,8 @@ const Navbar = () => {
           <Link to="/" className="navbar-logo">
           
 
- {/*<img src="/vite.jpeg" alt="Zynkly Logo" className="logo-image" /> */}
-            <span>Zynkly</span>
+ <img src="/vite.jpg" alt="Zynkly Logo" className="logo-image" />
+            {/* <span>Zynkly</span> */}
           </Link>
           <button
             className={`navbar-toggle ${menuOpen ? 'open' : ''}`}
