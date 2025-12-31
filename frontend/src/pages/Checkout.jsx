@@ -387,7 +387,7 @@ const Checkout = () => {
                   value={formData.city}
                   onChange={handleChange}
                   required
-                   placeholder="ex.-> near 22 hrs "
+                   placeholder="ex.- near 22 hrs "
                 />
               </div>
 {/* 
