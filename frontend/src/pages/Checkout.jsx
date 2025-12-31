@@ -356,7 +356,7 @@ const Checkout = () => {
             )}
 
             <div className="form-group">
-              <label>Street Address *</label>
+              <label>Pg Name *</label>
               <input
                 type="text"
                 name="street"
@@ -366,10 +366,21 @@ const Checkout = () => {
                 placeholder="123 Main St"
               />
             </div>
+              <div className="form-group">
+              <label>Room No. *</label>
+              <input
+                type="text"
+                name="Room No."
+                value={formData.street}
+                onChange={handleChange}
+                required
+                placeholder="123 Main St"
+              />
+            </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label>City *</label>
+                <label>Landmark *</label>
                 <input
                   type="text"
                   name="city"
@@ -378,7 +389,7 @@ const Checkout = () => {
                   required
                 />
               </div>
-
+{/* 
               <div className="form-group">
                 <label>State *</label>
                 <input
@@ -399,7 +410,7 @@ const Checkout = () => {
                   onChange={handleChange}
                   required
                 />
-              </div>
+              </div> */}
             </div>
 
             <div className="form-group">
