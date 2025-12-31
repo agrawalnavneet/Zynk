@@ -83,6 +83,7 @@ const Home = () => {
           <div className="hero-buttons">
             <Link to="/services" className="btn btn-primary">Book a Service</Link>
             <Link to="/services" className="btn btn-secondary">View Services</Link>
+           
           </div>
         </div>
       </section>

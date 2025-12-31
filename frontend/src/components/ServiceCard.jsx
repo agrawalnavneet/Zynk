@@ -33,12 +33,17 @@ const ServiceCard = ({ service }) => {
           <span className="service-duration">{service.duration} min</span>
         </div>
         <div className="service-actions">
+
+          {/* <button onClick={handleAddToCart} className="service-btn-cart">
+             Book Now
+          </button> */}
           <Link to={`/services/${service._id}`} className="service-btn">
             View Details
           </Link>
           <button onClick={handleAddToCart} className="service-btn-cart">
             🛒 Add to Cart
           </button>
+          
         </div>
       </div>
     </div>

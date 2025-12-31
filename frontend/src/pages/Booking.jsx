@@ -297,7 +297,7 @@ const Booking = () => {
             )}
 
             <div className="form-group">
-              <label>Street Address *</label>
+              <label>Pg Name *</label>
               <input
                 type="text"
                 name="street"
@@ -307,20 +307,33 @@ const Booking = () => {
                 placeholder="123 Main St"
               />
             </div>
+            <div className="form-group">
+                <label>Room No. *</label>
+                <input
+                  type="text"
+                  name="zRoom No."
+                  value={formData.zipCode}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label>City *</label>
+                <label>Landmark *</label>
                 <input
                   type="text"
-                  name="city"
+                  name="Landmark"
                   value={formData.city}
                   onChange={handleChange}
                   required
                 />
               </div>
 
-              <div className="form-group">
+
+                 
+
+              {/* <div className="form-group">
                 <label>State *</label>
                 <input
                   type="text"
@@ -329,9 +342,9 @@ const Booking = () => {
                   onChange={handleChange}
                   required
                 />
-              </div>
+              </div> */}
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label>Zip Code *</label>
                 <input
                   type="text"
@@ -340,7 +353,7 @@ const Booking = () => {
                   onChange={handleChange}
                   required
                 />
-              </div>
+              </div> */}
             </div>
 
             <div className="form-group">
