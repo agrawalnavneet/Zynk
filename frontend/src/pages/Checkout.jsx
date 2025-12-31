@@ -363,7 +363,7 @@ const Checkout = () => {
                 value={formData.street}
                 onChange={handleChange}
                 required
-                placeholder="123 Main St"
+                placeholder="eg.- Crowns Villa"
               />
             </div>
               <div className="form-group">
@@ -374,7 +374,7 @@ const Checkout = () => {
                 value={formData.street}
                 onChange={handleChange}
                 required
-                placeholder="123 Main St"
+                placeholder="ex.- 202"
               />
             </div>
 
@@ -387,6 +387,7 @@ const Checkout = () => {
                   value={formData.city}
                   onChange={handleChange}
                   required
+                   placeholder="ex.-> near 22 hrs "
                 />
               </div>
 {/* 
