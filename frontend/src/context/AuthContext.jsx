@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/auth/login', { email, password });
       if (res.data.token && res.data.user) {
         localStorage.setItem('token', res.data.token);
-        const expiry = Date.now() + 3 * 60 * 1000; // 3 minutes
+        const expiry = Date.now() + 12 * 60 * 60 * 1000; // 12 hours
         localStorage.setItem('tokenExpiry', expiry.toString());
         scheduleAutoLogout(expiry);
         setUser(res.data.user);

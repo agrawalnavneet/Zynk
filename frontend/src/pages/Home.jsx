@@ -427,7 +427,7 @@ const Home = () => {
                   <div className="quick-service-icon">🚿</div>
                   <h3>Bathroom Cleaning</h3>
                   <p>Sanitization, scrubbing, and mirror cleaning</p>
-                  <div className="quick-service-price">Starting at ₹{bathroomService?.price || 35}</div>
+                  <div className="quick-service-price">Starting at ₹{bathroomService?.price || 69}</div>
                   <div className="quick-service-time">⚡ 15 Minutes</div>
                   <div className="quick-service-actions">
                     <button 
@@ -448,7 +448,7 @@ const Home = () => {
                   <div className="quick-service-icon">🛏️</div>
                   <h3>Room Cleaning</h3>
                   <p>Dusting, vacuuming, bed making, and organizing</p>
-                  <div className="quick-service-price">Starting at ₹{roomService?.price || 40}</div>
+                  <div className="quick-service-price">Starting at ₹{roomService?.price || 69}</div>
                   <div className="quick-service-time">⚡ 15 Minutes</div>
                   <div className="quick-service-actions">
                     <button 
@@ -469,7 +469,7 @@ const Home = () => {
                   <div className="quick-service-icon">🍳</div>
                   <h3>Kitchen Cleaning</h3>
                   <p>Counter cleaning, appliance wiping, and sanitization</p>
-                  <div className="quick-service-price">Starting at ₹{kitchenService?.price || 45}</div>
+                  <div className="quick-service-price">Starting at ₹{kitchenService?.price || 39}</div>
                   <div className="quick-service-time">⚡ 15 Minutes</div>
                   <div className="quick-service-actions">
                     <button 
@@ -490,7 +490,7 @@ const Home = () => {
                   <div className="quick-service-icon">👔</div>
                   <h3>Laundry Services</h3>
                   <p>Wash, dry, and fold - all in 15 minutes!</p>
-                  <div className="quick-service-price">Starting at ₹{laundryService?.price || 30}</div>
+                  <div className="quick-service-price">Starting at ₹{laundryService?.price || 49}</div>
                   <div className="quick-service-time">⚡ 15 Minutes</div>
                   <div className="quick-service-actions">
                     <button 
@@ -552,7 +552,65 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+<footer className="zynkly-footer">
+  <div className="footer-container">
+
+
+    <div className="footer-brand">
+      
+      {/* <h2>Zynkly</h2> */}
+      <img 
+  src="/vite.jpg" 
+  alt="Zynkly Logo" 
+  className="footer-logo"
+/>
+      <p>India’s 15-Minute House Help Service</p>
     </div>
+
+
+    <div className="footer-links">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div className="footer-links">
+      <h3>Services</h3>
+      <ul>
+        <li>Home Cleaning</li>
+        <li>Office Cleaning</li>
+        <li>Deep Cleaning</li>
+        <li>Recurring Services</li>
+      </ul>
+    </div>
+
+    <div className="footer-contact">
+      <h3>Contact</h3>
+      <p>📍 India</p>
+      <p>📞 +91 7771083755</p>
+      <p>✉️ support@zynkly.com</p>
+    </div>
+
+  </div>
+
+  <div className="footer-bottom">
+    © 2025 Zynkly. All rights reserved.
+  </div>
+</footer>
+
+
+
+    </div>
+
+
+
+
+
   );
 };
 
