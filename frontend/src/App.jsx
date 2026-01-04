@@ -12,6 +12,7 @@ import Booking from './pages/Booking';
 import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
+import ThankYou from './pages/ThankYou';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminBookings from './pages/admin/AdminBookings';
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/booking/:id" element={<Booking />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/thank-you" element={<ThankYou />} />
 
         <Route path="/admin/*" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />

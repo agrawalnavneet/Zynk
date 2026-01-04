@@ -83,7 +83,7 @@
 //       setLoading(false);
 //       return;
 //     }
-    
+
 //     // STRICT VALIDATION: Reject test keys - only allow LIVE keys
 //     if (razorpayKey.startsWith('rzp_test_')) {
 //       showToast('Test keys detected! This application requires LIVE keys. Please update frontend/.env with LIVE keys starting with "rzp_live_".', 'error');
@@ -93,7 +93,7 @@
 //       setLoading(false);
 //       return;
 //     }
-    
+
 //     if (!razorpayKey.startsWith('rzp_live_')) {
 //       showToast('Invalid key format. Keys must start with "rzp_live_" for LIVE mode. Please check your frontend/.env file.', 'error');
 //       console.error('❌ ERROR: Invalid Razorpay Key ID format. Key must start with "rzp_live_" for LIVE mode.');
@@ -101,7 +101,7 @@
 //       setLoading(false);
 //       return;
 //     }
-    
+
 //     console.log('✅ Using Razorpay LIVE mode');
 //     console.log('⚠️  WARNING: This is LIVE mode - all payments are REAL transactions!');
 
@@ -183,7 +183,7 @@
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
-    
+
 //     if (bookingType === 'recurring' && !recurringFrequency) {
 //       showToast('Please select recurring frequency', 'error');
 //       return;
@@ -246,7 +246,7 @@
 //           <h1>Checkout & Payment</h1>
 //           <p className="checkout-subtitle">Review your order and complete payment</p>
 //         </div>
-        
+
 //         <div className="checkout-content">
 //           <div className="checkout-summary">
 //             <div className="summary-header">
@@ -500,7 +500,7 @@ const Checkout = () => {
       navigate('/services');
       showToast('Your cart is empty', 'info');
     }
-    
+
     // Set the plan based on cart items (assuming all items have same plan)
     if (cartItems.length > 0) {
       setPlan(cartItems[0].plan);
@@ -551,7 +551,7 @@ const Checkout = () => {
       setLoading(false);
       return;
     }
-    
+
     // STRICT VALIDATION
     if (razorpayKey.startsWith('rzp_test_')) {
       showToast('Test keys detected! This application requires LIVE keys. Please update frontend/.env with LIVE keys starting with "rzp_live_".', 'error');
@@ -559,14 +559,14 @@ const Checkout = () => {
       setLoading(false);
       return;
     }
-    
+
     if (!razorpayKey.startsWith('rzp_live_')) {
       showToast('Invalid key format. Keys must start with "rzp_live_" for LIVE mode. Please check your frontend/.env file.', 'error');
       console.error('❌ ERROR: Invalid Razorpay Key ID format.');
       setLoading(false);
       return;
     }
-    
+
     console.log('✅ Using Razorpay LIVE mode');
 
     try {
@@ -601,7 +601,7 @@ const Checkout = () => {
             if (verifyRes.data.success) {
               clearCart();
               showToast('Payment successful! Bookings confirmed.', 'success');
-              navigate('/dashboard');
+              navigate('/thank-you');
             } else {
               showToast(verifyRes.data.message || 'Payment verification failed', 'error');
               setLoading(false);
@@ -621,7 +621,7 @@ const Checkout = () => {
           color: '#10b981',
         },
         modal: {
-          ondismiss: function() {
+          ondismiss: function () {
             showToast('Payment cancelled', 'info');
             setLoading(false);
           },
@@ -645,7 +645,7 @@ const Checkout = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (bookingType === 'recurring' && !recurringFrequency) {
       showToast('Please select recurring frequency', 'error');
       return;
@@ -668,10 +668,10 @@ const Checkout = () => {
       const bookingPromises = cartItems.map(item => {
         const bookingData = {
           serviceId: item.service._id,
-          date: bookingType === 'instant' 
-            ? new Date().toISOString() 
+          date: bookingType === 'instant'
+            ? new Date().toISOString()
             : formData.date,
-          time: bookingType === 'instant' 
+          time: bookingType === 'instant'
             ? new Date().toTimeString().slice(0, 5)
             : formData.time,
           plan: item.plan,
@@ -711,7 +711,7 @@ const Checkout = () => {
           <h1>Checkout & Payment</h1>
           <p className="checkout-subtitle">Review your order and complete payment</p>
         </div>
-        
+
         <div className="checkout-content">
           <div className="checkout-summary">
             <div className="summary-header">
@@ -724,13 +724,13 @@ const Checkout = () => {
                   <div className="summary-item-info">
                     <h4>{item.service.name}</h4>
                     <p>
-                      {item.plan === 'one-time' ? 'One-Time' : 
-                       item.plan === 'hourly' ? 'Hourly' :
-                       item.plan === 'daily' ? 'Daily' :
-                       item.plan === 'weekly' ? 'Weekly' :
-                       item.plan === 'monthly' ? 'Monthly' :
-                       item.plan === 'yearly' ? 'Yearly' :
-                       item.plan.charAt(0).toUpperCase() + item.plan.slice(1)} 
+                      {item.plan === 'one-time' ? 'One-Time' :
+                        item.plan === 'hourly' ? 'Hourly' :
+                          item.plan === 'daily' ? 'Daily' :
+                            item.plan === 'weekly' ? 'Weekly' :
+                              item.plan === 'monthly' ? 'Monthly' :
+                                item.plan === 'yearly' ? 'Yearly' :
+                                  item.plan.charAt(0).toUpperCase() + item.plan.slice(1)}
                       × {item.quantity}
                     </p>
                   </div>
