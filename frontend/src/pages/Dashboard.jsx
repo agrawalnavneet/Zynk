@@ -115,8 +115,8 @@ const Dashboard = () => {
                     <div className="detail-row">
                       <span className="detail-label">Address:</span>
                       <span>
-                        {booking.address.street}, {booking.address.city}, {booking.address.state}{' '}
-                        {booking.address.zipCode}
+                        {/* {booking.address.street}, {booking.address.city}, {booking.address.state}{' '}
+                        {booking.address.zipCode} */}
                       </span>
                     </div>
                     <div className="detail-row">
