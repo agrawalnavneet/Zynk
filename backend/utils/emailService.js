@@ -409,7 +409,12 @@ const sendBookingConfirmationEmail = async (
       day: 'numeric',
     });
 
-    const fullAddress = `${address.street}, ${address.city}, ${address.state} ${address.zipCode}`;
+    let fullAddress;
+    if (address.street) {
+      fullAddress = `${address.street}, ${address.city}, ${address.state} ${address.zipCode}`;
+    } else {
+      fullAddress = `${address.PgName}, Room No: ${address.RoomNo}, Landmark: ${address.Landmark}`;
+    }
 
     const planNames = {
       'one-time': 'One-time',
@@ -464,20 +469,18 @@ const sendBookingConfirmationEmail = async (
               padding: 8px 16px;
               border-radius: 20px;
               font-weight: bold;
-              background-color: ${
-                status === 'confirmed'
-                  ? '#d1fae5'
-                  : status === 'pending'
-                  ? '#dbeafe'
-                  : '#fee2e2'
-              };
-              color: ${
-                status === 'confirmed'
-                  ? '#065f46'
-                  : status === 'pending'
-                  ? '#1e40af'
-                  : '#991b1b'
-              };
+              background-color: ${status === 'confirmed'
+          ? '#d1fae5'
+          : status === 'pending'
+            ? '#dbeafe'
+            : '#fee2e2'
+        };
+              color: ${status === 'confirmed'
+          ? '#065f46'
+          : status === 'pending'
+            ? '#1e40af'
+            : '#991b1b'
+        };
             }
             .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px; }
             .instructions {
@@ -537,16 +540,15 @@ const sendBookingConfirmationEmail = async (
                 <p style="margin: 0; color: #78350f;">${fullAddress}</p>
               </div>
 
-              ${
-                specialInstructions
-                  ? `
+              ${specialInstructions
+          ? `
               <div class="instructions">
                 <strong style="color: #1e40af; margin-bottom: 10px; display: block;">Special Instructions:</strong>
                 <p style="margin: 0; color: #1e3a8a;">${specialInstructions}</p>
               </div>
               `
-                  : ''
-              }
+          : ''
+        }
 
               <p style="margin-top: 30px;">We'll send you a reminder before your scheduled service. If you need to make any changes to your booking, please contact us or visit your dashboard.</p>
               <p style="margin-top: 20px;">Thank you for choosing Zynkly. We look forward to serving you!</p>
@@ -576,10 +578,9 @@ const sendBookingConfirmationEmail = async (
         - Total Amount: ₹${totalPrice.toLocaleString('en-IN')}
         Service Address:
         ${fullAddress}
-        ${
-          specialInstructions
-            ? `Special Instructions:\n${specialInstructions}\n\n`
-            : ''
+        ${specialInstructions
+          ? `Special Instructions:\n${specialInstructions}\n\n`
+          : ''
         }
         We'll send you a reminder before your scheduled service. If you need to make any changes to your booking, please contact us or visit your dashboard.
         Thank you for choosing Zynkly. We look forward to serving you!

@@ -7,9 +7,7 @@ const shouldForceLocalApi =
   rawApiUrl.includes('localhost:5000');
 
 const API_URL = shouldForceLocalApi
-  // ? 'http://localhost:3001/api'
-
-  ? 'https://api.zynkly.com/api'
+  ? 'http://localhost:3001/api'
   : rawApiUrl;
 
 if (shouldForceLocalApi) {
