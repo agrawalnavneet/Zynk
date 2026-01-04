@@ -300,7 +300,7 @@ const Booking = () => {
               <label>Pg Name *</label>
               <input
                 type="text"
-                name="street"
+                name="PgName"
                 value={formData.street}
                 onChange={handleChange}
                 required
@@ -311,7 +311,7 @@ const Booking = () => {
                 <label>Room No. *</label>
                 <input
                   type="text"
-                  name="zRoom No."
+                  name="RoomNo."
                   value={formData.zipCode}
                   onChange={handleChange}
                   required
