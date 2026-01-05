@@ -12,6 +12,7 @@ const services = [
     duration: 240,
     category: 'deep-cleaning',
     isActive: true,
+    image: 'https://images.unsplash.com/photo-1581578731117-104f2a412727?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Regular Cleaning',
@@ -27,6 +28,7 @@ const services = [
     duration: 120,
     category: 'regular-cleaning',
     isActive: true,
+    image: 'https://images.unsplash.com/photo-1527515637-62b9a8ab4d38?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Move-in Cleaning',
@@ -35,6 +37,7 @@ const services = [
     duration: 300,
     category: 'move-in-out',
     isActive: true,
+    image: 'https://images.unsplash.com/photo-1630699144385-d6981cfda55d?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Move-out Cleaning',
@@ -43,6 +46,7 @@ const services = [
     duration: 300,
     category: 'move-in-out',
     isActive: true,
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Office Cleaning',
@@ -51,6 +55,7 @@ const services = [
     duration: 180,
     category: 'office-cleaning',
     isActive: true,
+    image: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Post-Construction Cleaning',
@@ -59,6 +64,7 @@ const services = [
     duration: 360,
     category: 'post-construction',
     isActive: true,
+    image: 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Bathroom Cleaning',
@@ -75,6 +81,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Room Cleaning',
@@ -91,6 +98,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1522771753014-df70f11370b7?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Kitchen Cleaning',
@@ -107,6 +115,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1556910103-1c02745a30bf?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Laundry Services',
@@ -123,6 +132,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Window Cleaning',
@@ -139,6 +149,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1527515637-62b9a8ab4d38?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Sweeping',
@@ -155,6 +166,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1550966871-3ed3c47e2ce2?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Utensils Cleaning',
@@ -171,6 +183,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1581622558663-b2e33377dfb2?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Balcony Cleaning',
@@ -187,6 +200,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1527515637-62b9a8ab4d38?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Dusting',
@@ -203,6 +217,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600&auto=format&fit=crop'
   },
   {
     name: 'Mopping',
@@ -219,6 +234,7 @@ const services = [
     category: 'quick-service',
     isActive: true,
     isQuickService: true,
+    image: 'https://images.unsplash.com/photo-1527515637-62b9a8ab4d38?q=80&w=600&auto=format&fit=crop'
   },
 ];
 

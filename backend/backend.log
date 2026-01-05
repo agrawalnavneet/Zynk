@@ -1,0 +1,64 @@
+
+> backend@1.0.0 start
+> node server.js
+
+[dotenv@17.2.3] injecting env (12) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+📧 Initializing email service (Gmail) smtp.gmail.com:587, secure=false
+(node:10499) [MONGOOSE] Warning: Duplicate schema index on {"expiresAt":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Server running on port 3001
+MongoDB connected
+✅ Email service is ready to send messages
+2026-01-05T22:02:35.470Z - GET /api/health
+2026-01-05T22:03:34.624Z - GET /api/services
+2026-01-05T22:03:34.698Z - GET /api/services
+2026-01-05T22:03:50.167Z - POST /api/auth/login
+2026-01-05T22:06:13.661Z - POST /api/auth/login
+2026-01-05T22:06:30.587Z - POST /api/auth/verify-otp-and-register
+2026-01-05T22:06:48.818Z - POST /api/auth/login
+2026-01-05T22:07:07.917Z - POST /api/auth/login
+✅ Login email sent to: fixeduser@test.com
+2026-01-05T22:10:09.996Z - GET /api/services
+2026-01-05T22:10:10.037Z - GET /api/services
+2026-01-05T22:11:35.661Z - GET /api/services
+2026-01-05T22:11:49.935Z - GET /api/services
+2026-01-05T22:11:49.983Z - GET /api/services
+2026-01-05T22:12:02.267Z - GET /api/services/695c37164b5845ea39d47b03
+2026-01-05T22:12:02.314Z - GET /api/services/695c37164b5845ea39d47b03
+2026-01-05T22:12:13.893Z - POST /api/auth/login
+2026-01-05T22:12:15.709Z - GET /api/services
+2026-01-05T22:12:15.751Z - GET /api/services
+2026-01-05T22:14:07.179Z - POST /api/auth/login
+2026-01-05T22:14:07.362Z - GET /api/bookings
+2026-01-05T22:14:07.489Z - GET /api/bookings
+2026-01-05T22:14:09.655Z - GET /api/admin/stats
+2026-01-05T22:14:10.008Z - GET /api/admin/stats
+2026-01-05T22:14:10.378Z - GET /api/admin/stats
+✅ Login email sent to: admin@zynkly.com
+2026-01-05T22:14:14.652Z - GET /api/bookings
+2026-01-05T22:14:14.773Z - GET /api/bookings
+2026-01-05T22:14:15.604Z - GET /api/admin/services
+2026-01-05T22:14:15.683Z - GET /api/admin/services
+2026-01-05T22:14:24.238Z - GET /api/admin/users
+2026-01-05T22:14:24.315Z - GET /api/admin/users
+2026-01-05T22:14:31.685Z - GET /api/admin/services
+2026-01-05T22:14:31.762Z - GET /api/admin/services
+2026-01-05T22:14:32.548Z - GET /api/admin/stats
+2026-01-05T22:14:32.888Z - GET /api/admin/stats
+2026-01-05T22:16:03.827Z - GET /api/auth/me
+2026-01-05T22:16:03.876Z - GET /api/auth/me
+2026-01-05T22:36:13.360Z - POST /api/auth/send-otp
+✅ OTP email sent to: navneetagrawal2004@gmail.com
+✅ OTP sent to navneetagrawal2004@gmail.com
+2026-01-05T22:37:19.918Z - POST /api/auth/login
+2026-01-05T22:37:20.038Z - GET /api/services
+2026-01-05T22:37:20.079Z - POST /api/bookings
+✅ Login email sent to: fixeduser@test.com
+✅ Booking confirmation email sent to: fixeduser@test.com
+2026-01-05T22:38:18.614Z - GET /api/admin/stats
+2026-01-05T22:38:18.634Z - GET /api/auth/me
+2026-01-05T22:38:18.679Z - GET /api/auth/me
+2026-01-05T22:38:18.716Z - GET /api/auth/me
+2026-01-05T22:38:18.751Z - GET /api/auth/me
+2026-01-05T22:38:18.958Z - GET /api/admin/stats

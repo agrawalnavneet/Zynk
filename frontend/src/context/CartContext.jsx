@@ -32,31 +32,53 @@ export const CartProvider = ({ children }) => {
     }
   }, [cartItems]);
 
-  const addToCart = (service, plan = 'one-time') => {
+  const addToCart = async (service, plan = 'one-time') => {
+    // Get price based on plan
+    const price = plan === 'one-time'
+      ? service.price
+      : (service.pricingPlans && service.pricingPlans[plan])
+        ? service.pricingPlans[plan]
+        : service.price;
+
+    const newItem = {
+      service,
+      plan,
+      quantity: 1,
+      price
+    };
+
+    // Optimistically update local state first
     const existingItem = cartItems.find(
       item => item.service._id === service._id && item.plan === plan
     );
 
+    let newCartItems;
     if (existingItem) {
-      setCartItems(cartItems.map(item =>
+      newCartItems = cartItems.map(item =>
         item.service._id === service._id && item.plan === plan
           ? { ...item, quantity: item.quantity + 1 }
           : item
-      ));
+      );
     } else {
-      const price = plan === 'one-time' 
-        ? service.price 
-        : (service.pricingPlans && service.pricingPlans[plan]) 
-          ? service.pricingPlans[plan] 
-          : service.price;
-      
-      setCartItems([...cartItems, {
-        service,
-        plan,
-        quantity: 1,
-        price
-      }]);
+      newCartItems = [...cartItems, newItem];
     }
+    setCartItems(newCartItems);
+
+    // Sync with backend (fire and forget / non-blocking)
+    // Only attempt sync if we have a cart endpoint, otherwise just log or skip
+    // Currently relying on localStorage
+    /* 
+    try {
+      await api.post('/cart', {
+        serviceId: service._id,
+        plan,
+        quantity: 1
+      });
+    } catch (error) {
+      console.warn('Failed to sync cart with backend:', error);
+      // Suppress error so user flow isn't interrupted
+    }
+    */
   };
 
   const removeFromCart = (serviceId, plan) => {
@@ -103,4 +125,3 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-

@@ -39,7 +39,7 @@ const otpSchema = new mongoose.Schema({
 otpSchema.index({ email: 1, type: 1, expiresAt: 1 });
 
 // Clean up expired OTPs automatically
-otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// index is already defined in the schema field 'expires' property
 
 module.exports = mongoose.model('OTP', otpSchema);
 

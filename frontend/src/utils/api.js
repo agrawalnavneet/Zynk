@@ -1,23 +1,14 @@
 import axios from 'axios';
 
-const rawApiUrl = import.meta.env.VITE_API_URL;
-const shouldForceLocalApi =
-  !rawApiUrl ||
-  rawApiUrl.trim() === '' ||
-  rawApiUrl.includes('localhost:5000');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-const API_URL = shouldForceLocalApi
-  ? 'http://localhost:3001/api'
-  : rawApiUrl;
-
-if (shouldForceLocalApi) {
-  console.warn(
-    '[API] VITE_API_URL is missing or points to port 5000. Defaulting to http://localhost:3001/api'
-  );
-}
+console.log('Using API URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // Add token to requests
