@@ -114,17 +114,20 @@ const Dashboard = () => {
                     </div>
                     <div className="detail-row">
                       <span className="detail-label">Address:</span>
-                      <span>
-                        {/* {booking.address.street}, {booking.address.city}, {booking.address.state}{' '}
-                        {booking.address.zipCode} */}
-                      </span>
+                      {booking.PgName && (
+                        <>
+                          <div className="address-line">{booking.PgName}</div>
+                          <div className="address-line">Room: {booking.RoomNo}</div>
+                          <div className="address-line">Near {booking.Landmark}</div>
+                        </>
+                      )}
                     </div>
                     <div className="detail-row">
                       <span className="detail-label">Booking Type:</span>
                       <span className="booking-type-badge">
-                        {booking.bookingType === 'instant' ? '⚡ Instant' : 
-                         booking.bookingType === 'scheduled' ? '📅 Scheduled' : 
-                         '🔄 Recurring'}
+                        {booking.bookingType === 'instant' ? '⚡ Instant' :
+                          booking.bookingType === 'scheduled' ? '📅 Scheduled' :
+                            '🔄 Recurring'}
                         {booking.recurringFrequency && ` (${booking.recurringFrequency})`}
                       </span>
                     </div>
@@ -141,10 +144,10 @@ const Dashboard = () => {
                     <div className="detail-row">
                       <span className="detail-label">Payment Status:</span>
                       <span className={`payment-status-badge ${booking.paymentStatus || 'pending'}`}>
-                        {booking.paymentStatus === 'paid' ? '✓ Paid' : 
-                         booking.paymentStatus === 'failed' ? '✕ Failed' : 
-                         booking.paymentStatus === 'refunded' ? '↩ Refunded' : 
-                         '⏳ Pending'}
+                        {booking.paymentStatus === 'paid' ? '✓ Paid' :
+                          booking.paymentStatus === 'failed' ? '✕ Failed' :
+                            booking.paymentStatus === 'refunded' ? '↩ Refunded' :
+                              '⏳ Pending'}
                       </span>
                     </div>
                     {booking.specialInstructions && (
