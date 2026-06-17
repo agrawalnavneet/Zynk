@@ -304,11 +304,11 @@ const Home = () => {
       <section className="statistics">
         <div className="container">
           <div className="stat-item">
-            <div className="stat-number">99+</div>
+            <div className="stat-number">999+</div>
             <div className="stat-label">Homes cleaned</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">215+</div>
+            <div className="stat-number">2015+</div>
             <div className="stat-label">Hours saved</div>
           </div>
           <div className="stat-item">
@@ -364,7 +364,7 @@ const Home = () => {
                 <div className="author-avatar">K</div>
                 <div className="author-info">
                   <div className="author-name">Kirti</div>
-                  <div className="author-location">Sector 56</div>
+                  <div className="author-location">AGI Sky Garden</div>
                 </div>
               </div>
             </div>
@@ -376,7 +376,7 @@ const Home = () => {
                 <div className="author-avatar">N</div>
                 <div className="author-info">
                   <div className="author-name">Neha</div>
-                  <div className="author-location">Sector 57</div>
+                  <div className="author-location">Jalandhar Heights I</div>
                 </div>
               </div>
             </div>
@@ -388,7 +388,7 @@ const Home = () => {
                 <div className="author-avatar">P</div>
                 <div className="author-info">
                   <div className="author-name">Pradnyesh</div>
-                  <div className="author-location">Suncity</div>
+                  <div className="author-location">Green Valley</div>
                 </div>
               </div>
             </div>
@@ -400,7 +400,7 @@ const Home = () => {
                 <div className="author-avatar">R</div>
                 <div className="author-info">
                   <div className="author-name">Ritika</div>
-                  <div className="author-location">Sector 57</div>
+                  <div className="author-location">AGI Sky Garden</div>
                 </div>
               </div>
             </div>
@@ -411,7 +411,7 @@ const Home = () => {
 
 
 {/* Quick 15 minutes services*/}
-      <section className="quick-services-section">
+      {/* <section className="quick-services-section">
         <div className="container">
           <div className="section-header">
             <h2> Coming Soon</h2>
@@ -516,7 +516,7 @@ const Home = () => {
             />
           )}
         </div>
-      </section>
+      </section> */}
 
 
 
@@ -560,11 +560,11 @@ const Home = () => {
     <div className="footer-brand">
       
       {/* <h2>Zynkly</h2> */}
-      <img 
+      {/* <img 
   src="/vite.jpg" 
   alt="Zynkly Logo" 
   className="footer-logo"
-/>
+/> */}
       <p>India’s 15-Minute House Help Service</p>
     </div>
 
@@ -592,7 +592,7 @@ const Home = () => {
     <div className="footer-contact">
       <h3>Contact</h3>
       <p>📍 India</p>
-      <p>📞 +91 7771083755</p>
+      <p>📞 +91 7722962773</p>
       <p>✉️ support@zynkly.com</p>
     </div>
 
