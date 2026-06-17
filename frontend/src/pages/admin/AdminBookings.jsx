@@ -138,7 +138,9 @@ const AdminBookings = () => {
                       </div>
                     </td>
                     <td className="address-cell">
-                      {booking.address?.street}, {booking.address?.city}
+                      {booking.PgName
+                        ? <>{booking.PgName}{booking.RoomNo ? `, Room: ${booking.RoomNo}` : ''}{booking.Landmark ? `, Near ${booking.Landmark}` : ''}</>
+                        : 'N/A'}
                     </td>
                     <td className="amount-cell">₹{booking.totalPrice?.toLocaleString('en-IN') || 0}</td>
                     <td>

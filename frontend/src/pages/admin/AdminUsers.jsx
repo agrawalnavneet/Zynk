@@ -110,8 +110,8 @@ const AdminUsers = () => {
                     <td>{user.email || 'N/A'}</td>
                     <td>{user.phone || 'N/A'}</td>
                     <td className="address-cell">
-                      {user.address?.street
-                        ? `${user.address.street}, ${user.address.city}, ${user.address.state}`
+                      {user.bookingAddress
+                        ? <>{user.bookingAddress.PgName}{user.bookingAddress.RoomNo ? `, Room: ${user.bookingAddress.RoomNo}` : ''}{user.bookingAddress.Landmark ? `, Near ${user.bookingAddress.Landmark}` : ''}</>
                         : 'N/A'}
                     </td>
                     <td>{new Date(user.createdAt).toLocaleDateString()}</td>

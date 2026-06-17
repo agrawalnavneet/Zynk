@@ -12,6 +12,8 @@ import Booking from './pages/Booking';
 import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
+import Contact from './pages/Contact';
+import About from './pages/About';
 import ThankYou from './pages/ThankYou';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -36,6 +38,8 @@ export default function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
 
         <Route path="/admin/*" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />

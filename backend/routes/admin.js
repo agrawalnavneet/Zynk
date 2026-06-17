@@ -105,8 +105,40 @@ router.get('/users', auth, requireAdmin, async (req, res) => {
   try {
     const users = await User.find({ role: 'customer' })
       .select('-password')
-      .sort({ createdAt: -1 });
-    res.json(users);
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Fetch the latest booking for each user to get their address
+    const userIds = users.map(u => u._id);
+    const latestBookings = await Booking.aggregate([
+      { $match: { user: { $in: userIds }, PgName: { $exists: true, $ne: '' } } },
+      { $sort: { createdAt: -1 } },
+      { $group: {
+          _id: '$user',
+          PgName: { $first: '$PgName' },
+          RoomNo: { $first: '$RoomNo' },
+          Landmark: { $first: '$Landmark' },
+        }
+      }
+    ]);
+
+    // Build a map of userId -> booking address
+    const addressMap = {};
+    latestBookings.forEach(b => {
+      addressMap[b._id.toString()] = {
+        PgName: b.PgName,
+        RoomNo: b.RoomNo,
+        Landmark: b.Landmark,
+      };
+    });
+
+    // Attach booking address to each user
+    const usersWithAddress = users.map(u => ({
+      ...u,
+      bookingAddress: addressMap[u._id.toString()] || null,
+    }));
+
+    res.json(usersWithAddress);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

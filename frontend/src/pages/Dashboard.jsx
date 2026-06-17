@@ -18,6 +18,10 @@ const Dashboard = () => {
       navigate('/login');
       return;
     }
+    if (user && user.role === 'admin') {
+      navigate('/admin');
+      return;
+    }
     if (user) {
       fetchBookings();
     }
@@ -139,7 +143,7 @@ const Dashboard = () => {
                     </div>
                     <div className="detail-row">
                       <span className="detail-label">Total Price:</span>
-                      <span className="price">${booking.totalPrice}</span>
+                      <span className="price">₹{booking.totalPrice}</span>
                     </div>
                     <div className="detail-row">
                       <span className="detail-label">Payment Status:</span>

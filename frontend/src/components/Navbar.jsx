@@ -52,20 +52,26 @@ const Navbar = () => {
           <ul className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
             <li><Link to="/" onClick={closeMenu}>Home</Link></li>
             <li><Link to="/services" onClick={closeMenu}>Services</Link></li>
+            <li><Link to="/about" onClick={closeMenu}>About</Link></li>
+            <li><Link to="/contact" onClick={closeMenu}>Contact</Link></li>
             {user ? (
               <>
-                <li><Link to="/dashboard" onClick={closeMenu}>Dashboard</Link></li>
+                {user.role !== 'admin' && (
+                  <li><Link to="/dashboard" onClick={closeMenu}>Dashboard</Link></li>
+                )}
                 {user.role === 'admin' && (
                   <li><Link to="/admin" className="admin-link" onClick={closeMenu}>Admin Panel</Link></li>
                 )}
-                <li>
-                  <button className="cart-icon-btn" onClick={openCart} title="View Cart">
-                    🛒 Cart
-                    {getTotalItems() > 0 && (
-                      <span className="cart-badge">{getTotalItems()}</span>
-                    )}
-                  </button>
-                </li>
+                {user.role !== 'admin' && (
+                  <li>
+                    <button className="cart-icon-btn" onClick={openCart} title="View Cart">
+                      🛒 Cart
+                      {getTotalItems() > 0 && (
+                        <span className="cart-badge">{getTotalItems()}</span>
+                      )}
+                    </button>
+                  </li>
+                )}
                 <li><span className="user-name">{user.name}</span></li>
                 <li><button onClick={() => { handleLogout(); closeMenu(); }} className="logout-btn">Logout</button></li>
               </>
