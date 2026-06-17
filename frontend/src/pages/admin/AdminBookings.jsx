@@ -134,7 +134,11 @@ const AdminBookings = () => {
                     <td>
                       <div className="date-cell">
                         <div>{new Date(booking.date).toLocaleDateString()}</div>
-                        <div className="time">{booking.time}</div>
+                        <div className="time">
+                          {booking.bookingType === 'instant' 
+                            ? new Date(booking.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            : booking.time}
+                        </div>
                       </div>
                     </td>
                     <td className="address-cell">

@@ -87,7 +87,11 @@ router.post('/', auth, async (req, res) => {
     let bookingTime = time;
     if (bookingType === 'instant') {
       bookingDate = new Date();
-      bookingTime = new Date().toTimeString().slice(0, 5);
+      // Use the time sent from the frontend (user's local time)
+      // Only fallback to server time if not provided
+      if (!bookingTime) {
+        bookingTime = new Date().toTimeString().slice(0, 5);
+      }
     }
 
     const booking = new Booking({
