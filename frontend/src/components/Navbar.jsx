@@ -13,8 +13,9 @@ const Navbar = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Hide the regular navbar (and cart) on admin routes
+  // Hide the regular navbar for admin routes and admin users
   if (location.pathname.startsWith('/admin')) return null;
+  if (user?.role === 'admin') return null;
 
   const handleLogout = () => {
     logout();

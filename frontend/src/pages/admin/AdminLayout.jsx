@@ -85,10 +85,6 @@ const AdminLayout = () => {
             <span className="nav-icon">↩︎</span>
             Logout
           </button>
-          <Link to="/dashboard" className="admin-nav-link" onClick={closeSidebar}>
-            <span className="nav-icon">🏠</span>
-            User Dashboard
-          </Link>
         </div>
       </div>
       <div className="admin-content">
