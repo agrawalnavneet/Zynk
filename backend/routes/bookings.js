@@ -4,6 +4,7 @@ const Service = require('../models/Service');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { sendBookingConfirmationEmail } = require('../utils/emailService');
+const { notifyIntegrationsOnBooking } = require('../utils/integrations');
 
 const router = express.Router();
 
@@ -112,6 +113,11 @@ router.post('/', auth, async (req, res) => {
     await booking.save();
     await booking.populate('service');
     await booking.populate('user', 'name email');
+
+    // Notify third-party integrations (non-blocking)
+    notifyIntegrationsOnBooking(booking).catch((err) => {
+      console.error('Integration dispatcher error:', err.message);
+    });
 
     // Send booking confirmation email (non-blocking)
     if (booking.user && booking.user.email) {

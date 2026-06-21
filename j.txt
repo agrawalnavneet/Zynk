@@ -1,0 +1,20 @@
+curl -X 'POST' \
+  'http://localhost:7001/api/v1/bookings' \
+  -H 'accept: */*' \
+  -H 'x-api-key: 71f05705fc62a17b972a96ad96cfa1d5ad9e607b44ea96d5075ba4df611c7f6f' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "branch": "jalandhar",
+  "user_name": "Nikhil Sharma",
+  "user_id": "664f1a2b3c4d5e6f7a8b9c0d",
+  "user_phone": "+919876543210",
+  "address": "123 Main St, Jalandhar",
+  "live_location_url": "https://maps.google.com/?q=31.326,75.576",
+  "house_helper_name": "Ramesh Kumar",
+  "booking_via": "app",
+  "booking_created_date_and_time": "2026-05-03T10:30:00.000Z",
+  "package_name": "Premium Package",
+  "payment_method": "online",
+  "payment_amount": 1500,
+  "payment_status": "pending"
+}'
