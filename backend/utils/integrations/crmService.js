@@ -35,7 +35,7 @@ function buildCrmPayload(booking, userPhone) {
     address,
     // live_location_url: 'N/A',
     // house_helper_name: 'N/A',
-    booking_via: 'Website',
+    booking_via: 'website',
     booking_created_date_and_time: booking.createdAt?.toISOString() ?? new Date().toISOString(),
     package_name: booking.service?.name ?? '',
     payment_method: 'online',
