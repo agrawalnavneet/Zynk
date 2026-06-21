@@ -1,6 +1,7 @@
 const https = require('https');
 const http = require('http');
 const { URL } = require('url');
+const User = require('../../models/User');
 
 const LOG_PREFIX = '[Integration:CRM]';
 
@@ -21,7 +22,7 @@ function logError(msg, err) {
 /**
  * Maps a saved booking document (with populated user and service) to the CRM payload shape.
  */
-function buildCrmPayload(booking) {
+function buildCrmPayload(booking, userPhone) {
   const address = [booking.PgName, booking.RoomNo, booking.Landmark]
     .filter(Boolean)
     .join(', ');
@@ -30,7 +31,7 @@ function buildCrmPayload(booking) {
     branch: 'jalandhar',
     user_name: booking.user?.name ?? '',
     user_id: booking.user?._id?.toString() ?? '',
-    user_phone: booking.user?.phone || 'N/A',
+    user_phone: userPhone || 'N/A',
     address,
     live_location_url: 'N/A',
     house_helper_name: 'N/A',
@@ -46,7 +47,21 @@ function buildCrmPayload(booking) {
 /**
  * POSTs the booking to the CRM API.
  */
-function sendBookingToCrm(booking) {
+async function sendBookingToCrm(booking) {
+  // Resolve phone: use populated user.phone, else look up by user ID
+  let userPhone = booking.user?.phone;
+  if (!userPhone) {
+    const userId = booking.user?._id ?? booking.user;
+    if (userId) {
+      try {
+        const user = await User.findById(userId).select('phone').lean();
+        userPhone = user?.phone;
+      } catch (e) {
+        logError('Failed to fetch user phone for booking', e.message);
+      }
+    }
+  }
+
   return new Promise((resolve, reject) => {
     // Read env vars lazily so dotenv has always run before this point
     const crmBaseUrl = process.env.CRM_BASE_URL;
@@ -67,7 +82,7 @@ function sendBookingToCrm(booking) {
       return reject(err);
     }
 
-    const payload = buildCrmPayload(booking);
+    const payload = buildCrmPayload(booking, userPhone);
     const body = JSON.stringify(payload);
 
     log('Payload built', payload);
