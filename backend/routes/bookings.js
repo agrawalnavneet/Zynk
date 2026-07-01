@@ -3,7 +3,6 @@ const Booking = require('../models/Booking');
 const Service = require('../models/Service');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const { sendBookingConfirmationEmail } = require('../utils/emailService');
 const { notifyIntegrationsOnBooking } = require('../utils/integrations');
 
 const router = express.Router();
@@ -118,31 +117,6 @@ router.post('/', auth, async (req, res) => {
     notifyIntegrationsOnBooking(booking).catch((err) => {
       console.error('Integration dispatcher error:', err.message);
     });
-
-    // Send booking confirmation email (non-blocking)
-    if (booking.user && booking.user.email) {
-      sendBookingConfirmationEmail(
-        booking.user.email,
-        booking.user.name,
-        {
-          service: booking.service,
-          date: booking.date,
-          time: booking.time,
-          address: {
-            PgName: booking.PgName,
-            RoomNo: booking.RoomNo,
-            Landmark: booking.Landmark
-          },
-          totalPrice: booking.totalPrice,
-          plan: booking.plan,
-          bookingType: booking.bookingType,
-          status: booking.status,
-          specialInstructions: booking.specialInstructions,
-        }
-      ).catch((err) => {
-        console.error('Failed to send booking confirmation email:', err);
-      });
-    }
 
     res.status(201).json(booking);
   } catch (error) {

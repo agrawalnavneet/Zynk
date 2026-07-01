@@ -155,7 +155,11 @@ router.post('/verify-payment', auth, async (req, res) => {
               service: booking.service,
               date: booking.date,
               time: booking.time,
-              address: booking.address,
+              address: {
+                PgName: booking.PgName,
+                RoomNo: booking.RoomNo,
+                Landmark: booking.Landmark,
+              },
               totalPrice: booking.totalPrice,
               plan: booking.plan,
               bookingType: booking.bookingType,
